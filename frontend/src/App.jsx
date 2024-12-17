@@ -18,6 +18,7 @@ function App() {
     <Routes>
         <Route path="/" element={<div><Slider /><BMICalculator/><Footer/></div>} />
     </Routes>
+    <Footer/>
     </Router>
 
 
