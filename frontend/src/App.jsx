@@ -1,24 +1,25 @@
-import { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BMICalculator from './components/BMICalculator';
+import Signup from './components/Signup';
+import Slider from './components/Slider';
 
 
 
-import './App.css'
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <Router>
-    <Header />
-    
-    <Routes>
-        <Route path="/" element={<div><Slider /><BMICalculator/><Footer/></div>} />
-    </Routes>
-    <Footer/>
+      <Header />
+      <Routes>
+        <Route path="/" element={<div><Slider /><BMICalculator /><Footer /></div>} />
+        <Route path="/" element={<Slider />} />
+        <Route path="/signup" element={<Signup />} />
+
+      </Routes>
     </Router>
 
 

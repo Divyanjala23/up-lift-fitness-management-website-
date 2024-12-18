@@ -1,15 +1,13 @@
 import React, { PureComponent } from 'react';
-// Importing the image for background
 import backgroundImage from '../assets/img/gallery/section_bg03.png';
-import Logo from '../assets/img/logo/logo.png';  // Corrected the import statement
+import Logo from '../assets/img/logo/logo.png'; 
+import '../assets/css/footer.css'
 
 export class Footer extends PureComponent {
   render() {
     return (
       <div
         className="footer-area section-bg"
-        // Using inline style to set the background image dynamically
-        style={{ backgroundImage: `url(${backgroundImage})` }}
       >
         <div className="container">
           <div className="footer-top footer-padding">
@@ -58,7 +56,9 @@ export class Footer extends PureComponent {
                 <div className="single-footer-caption mb-50">
                   <div className="footer-logo">
                     {/* Replacing hardcoded logo with imported Logo */}
-                    <a href="index.html"><img src={Logo} alt="Logo" /></a>
+                    <a href="index.html">
+                      <img className='img-fluid' src={Logo} alt="Logo" />
+                      </a>
                   </div>
                   <div className="footer-tittle">
                     <div className="footer-pera">

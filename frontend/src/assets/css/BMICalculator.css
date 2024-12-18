@@ -1,0 +1,97 @@
+.bmi-container {
+    background-image: url("../img/gallery/contact_form.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    margin: 0 auto;
+    padding: 17em 10em;
+    background-color: #1c1c1c; /* Dark background for the gym theme */
+    color: white;
+  }
+  
+  /* Header */
+  .bmi-container h2 {
+    text-align: center;
+    color: #ff1313; /* Red color for header */
+    font-size: 50px;
+    margin-bottom: 20px;
+  }
+  
+  /* Form Styling */
+  .bmi-container .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .bmi-container .form-group label {
+    font-size: 1.5em;
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #fff;
+  }
+  
+  .bmi-container form{
+    width: 50%;
+    margin: 0 auto;
+  }
+  
+  .bmi-container .form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+  }
+  
+  .bmi-container .form-group input:focus {
+    border-color: #ff1313; /* Red border color on focus */
+    outline: none;
+  }
+  
+  /* Buttons */
+  .bmi-container button {
+    width: 48%;
+    padding: 12px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #ff1313; /* Red button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+  }
+  
+  .bmi-container button:hover {
+    background-color: #ff1313; /* Darker red on hover */
+  }
+  
+  .bmi-container button[type="button"] {
+    background-color: #333; /* Black reset button */
+    margin-left: 4%;
+  }
+  
+  .bmi-container button[type="button"]:hover {
+    background-color: #555; /* Lighter black on hover */
+  }
+  
+  /* Result Section */
+  .bmi-result {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 18px;
+  }
+  
+  .bmi-result h3 {
+    color: #ff1313; /* Red color for result text */
+  }
+  
+  .bmi-result p {
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .bmi-result p {
+    font-size: 16px;
+  }

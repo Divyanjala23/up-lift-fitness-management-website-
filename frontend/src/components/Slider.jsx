@@ -1,4 +1,6 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
+import '../assets/css/slider.css';
 
 const Slider = () => {
   return (
@@ -15,7 +17,7 @@ const Slider = () => {
                                 <div class="hero__caption">
                                     <span data-animation="fadeInLeft" data-delay="0.1s">with patrick potter</span>
                                     <h1 data-animation="fadeInLeft" data-delay="0.4s">Build Perfect body Shape for good and Healthy life.</h1>
-                                    <a href="from.html" class="btn hero-btn" data-animation="fadeInLeft" data-delay="0.8s">became a member</a>
+                                    <Link to="/signup" class="btn hero-btn" data-animation="fadeInLeft" data-delay="0.8s">became a member</Link>
                                 </div>
                             </div>
                         </div>
