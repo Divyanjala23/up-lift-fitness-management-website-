@@ -17,7 +17,6 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private MemberRepo memberRepo;
 
-
     @Autowired
     private SequenceGeneratorService sequenceGeneratorService;
 
@@ -32,8 +31,9 @@ public class MemberServiceImpl implements MemberService {
 
     private String generateUniqueId() {
         // Example: Generate a UUID and return the first 8 characters
-        return "M"+UUID.randomUUID().toString().substring(0, 8);
+        return "M" + UUID.randomUUID().toString().substring(0, 8);
     }
+
     @Override
     public Member getMemberById(String id) {
         return memberRepo.findById(id)
@@ -41,7 +41,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> getAllMembers(){
+    public List<Member> getAllMembers() {
         return memberRepo.findAll();
     }
 
@@ -49,6 +49,7 @@ public class MemberServiceImpl implements MemberService {
     public void deleteMember(String id) {
         memberRepo.deleteById(id);
     }
+
     @Override
     public Member updateMember(String id, Member member) {
         if (memberRepo.existsById(id)) {
@@ -57,4 +58,5 @@ public class MemberServiceImpl implements MemberService {
         }
         return null; // Return null or throw an exception if not found
     }
+
 }

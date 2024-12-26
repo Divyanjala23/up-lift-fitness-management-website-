@@ -17,7 +17,7 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-    @PostMapping
+    @PostMapping("/signup")
     public ResponseEntity<Member> saveMember(@RequestBody Member member) {
             Member createdMember =
                     this.memberService.saveMember(member);
