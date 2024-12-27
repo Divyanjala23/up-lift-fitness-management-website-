@@ -8,11 +8,13 @@ import com.uplift.repo.AdminRepo;
 import com.uplift.repo.CoachRepo;
 import com.uplift.repo.MemberRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoginService {
 
+    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private AdminRepo adminRepo;
 
@@ -26,19 +28,19 @@ public class LoginService {
         // Check Admin collection
 
         Admin admin = adminRepo.findByUsername(username);
-        if (admin != null && admin.getPassword().equals(password)) {
+        if (admin != null && bCryptPasswordEncoder.matches(password, admin.getPassword())) {
             return new UserDTO(username, "ADMIN", admin.getAdminId());
         }
 
         // Check Coach collection
         Coach coach = coachRepo.findByUsername(username);
-        if (coach != null && coach.getPassword().equals(password)) {
+        if (coach != null && bCryptPasswordEncoder.matches(password, coach.getPassword())) {
             return new UserDTO(username, "COACH", coach.getCoachId());
         }
 
         // Check Member collection
         Member member = memberRepo.findByUsername(username);
-        if (member != null && member.getPassword().equals(password)) {
+        if (member != null && bCryptPasswordEncoder.matches(password, member.getPassword())) {
             return new UserDTO(username, "MEMBER", member.getMemberId());
         }
 

@@ -3,6 +3,7 @@ package com.uplift.service.impl;
 import com.uplift.model.Member;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.uplift.repo.MemberRepo;
@@ -26,6 +27,9 @@ public class MemberServiceImpl implements MemberService {
             String customId = String.format("M%04d", seqValue); // Format: M001, M002, etc.
             member.setMemberId(customId);
         }
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(8);
+        String encodedPassword = bCryptPasswordEncoder.encode(member.getPassword());
+        member.setPassword(encodedPassword);
         return memberRepo.save(member);
     }
 
