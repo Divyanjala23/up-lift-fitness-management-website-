@@ -5,6 +5,7 @@ import BMICalculator from './components/BMICalculator';
 import Signup from './components/Signup';
 import Slider from './components/Slider';
 import Login from './components/Login';
+import Forum from './components/Forum';
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
         <Route path="/" element={<div><Slider /><BMICalculator /><Footer /></div>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login/>}/>
+        <Route path="/forum" element={<div><Forum /></div>}/>
+
+      
       </Routes>
     </Router>
   );

@@ -1,111 +1,181 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import '../assets/css/signUp.css';
 
 const Signup = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
+  const [selectedRole, setSelectedRole] = useState(null); // State to manage selected role
+  const [formData, setFormData] = useState({
+    fullname: "",
+    email: "",
+    experience: "",
+    specialization: "",
+    age: "",
+    gender: "",
+    username: "",
+    password: "",
+  });
 
-    // Handle input changes and update form data
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            console.log('Passwords do not match');
-            return;
-        }
-        console.log('Form Submitted:', formData);
-        // You can add form submission logic here, e.g., sending the data to an API
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(`${selectedRole} Registration Data:`, formData);
+  };
 
-    return (
-        <main className="signup-main">
-            <div className="container">
-                <h2 className="form-header">Sign Up</h2>
-            </div>
+  return (
+    <div className="signup-main">
+      <div className="container">
+        {!selectedRole ? (
+          <div className="role-selection">
+            <h2 className="form-header">Select Role</h2>
+            <button className="buttonm" onClick={() => setSelectedRole("Coach")}>
+              {/* <img src="/path/to/coach-icon.png" alt="Coach Icon" /> */}
+              COACH
+            </button>
+            <button className="buttonm" onClick={() => setSelectedRole("Member")}>
+              {/* <img src="/path/to/member-icon.png" alt="Member Icon" /> */}
+              MEMBER
+            </button>
+          </div>
+        ) : (
+          <div className="form-container">
+            <h2 className="section-title">{selectedRole} Registration</h2>
+            <form onSubmit={handleSubmit} className="signup-form">
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  name="fullname"
+                  placeholder="Full Name"
+                  value={formData.fullname}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
 
-            <div className="form-container">
-                <div className="form-title">
-                    <h2 className="section-title">Create Your Account</h2>
-                </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
 
-                <form onSubmit={handleSubmit} className="Signup-form">
-                    <div className="form-group">
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Full Name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            className="form-input"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="text"
-                            name="phone"
-                            placeholder="Phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            required
-                            className="form-input"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="form-input"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            className="form-input"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            placeholder="Confirm Password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                            className="form-input"
-                        />
-                    </div>
-                    <div className="submit-info">
-                        <button className="btn" type="submit">
-                            Sign Up
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </main>
-    );
+              {selectedRole === "Coach" && (
+                <>
+                  <div className="form-group">
+                    <label>Experience in Years</label>
+                    <input
+                      type="number"
+                      name="experience"
+                      placeholder="Experience in Years"
+                      value={formData.experience}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Specialization</label>
+                    <input
+                      type="text"
+                      name="specialization"
+                      placeholder="Specialization"
+                      value={formData.specialization}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
+              {selectedRole === "Member" && (
+                <>
+                  <div className="form-group">
+                    <label>Age</label>
+                    <input
+                      type="number"
+                      name="age"
+                      placeholder="Age"
+                      value={formData.age}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Gender</label>
+                    <select
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      required
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+
+              <button type="submit" className="button">
+                Register as {selectedRole}
+              </button>
+
+              <button
+                type="button"
+                className="button"
+                onClick={() => setSelectedRole(null)}
+                style={{ marginTop: "10px", backgroundColor: "#6c757d" }}
+              >
+                Go Back
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Signup;
