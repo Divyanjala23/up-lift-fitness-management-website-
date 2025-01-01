@@ -1,6 +1,10 @@
 .about-main {
+<<<<<<< HEAD
     background-image: url('../img/hero/alexander-red-qo1pyCD02t4-unsplash.png');
     background-size: cover;
+=======
+    background-color: #000; /* Black background */
+>>>>>>> 7ddbd9a28e129308c3a6aa4045d71a533516166e
     padding: 50px 20px;
     color: #fff; /* White text for contrast */
     min-height: 100vh;
@@ -58,5 +62,9 @@
     content: "✓ "; /* Checkmark icon */
     color: #ff0000; /* Red checkmark */
     font-weight: bold;
+<<<<<<< HEAD
   }
   
+=======
+  }
+>>>>>>> 7ddbd9a28e129308c3a6aa4045d71a533516166e
