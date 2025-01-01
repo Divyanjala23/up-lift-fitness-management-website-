@@ -1,97 +1,133 @@
 .bmi-container {
-    background-image: url("../img/gallery/contact_form.png");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
-    margin: 0 auto;
-    padding: 17em 10em;
-    background-color: #1c1c1c; /* Dark background for the gym theme */
-    color: white;
+  background: linear-gradient(to right, #1c1c1c, #333); /* Dark black gradient background */
+  background-size: cover;
+  background-attachment: fixed;
+  margin: 0 auto;
+  padding: 8em 2em;
+  color: white;
+  /* border-radius: 15px; */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  /* max-width: 90%; */
+}
+
+.bmi-container h2 {
+  text-align: center;
+  color: #ff1313; /* Red color for the header */
+  font-size: 3rem;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 8px rgba(255, 19, 19, 0.7);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Form Styling */
+.bmi-container form {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1); /* Transparent white overlay */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.bmi-container .form-group {
+  margin-bottom: 20px;
+}
+
+.bmi-container .form-group label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #ff1313; /* Red label text */
+}
+
+.bmi-container .form-group input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  margin-top: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s, background-color 0.3s;
+}
+
+.bmi-container .form-group input:focus {
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 8px #ff1313; /* Red glow on focus */
+  outline: none;
+}
+
+/* Buttons */
+.bmi-container button {
+  width: 48%;
+  padding: 12px;
+  font-size: 1.1rem;
+  color: #fff;
+  background: linear-gradient(45deg, #ff1313, #cc0000); /* Red gradient button */
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 10px rgba(255, 19, 19, 0.4);
+}
+
+.bmi-container button:hover {
+  background: linear-gradient(45deg, #cc0000, #ff1313); /* Inverted red gradient on hover */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(255, 19, 19, 0.6);
+}
+
+.bmi-container button[type="button"] {
+  background: linear-gradient(45deg, #333, #444); /* Black reset button */
+  margin-left: 4%;
+}
+
+.bmi-container button[type="button"]:hover {
+  background: linear-gradient(45deg, #444, #333);
+  box-shadow: 0 4px 10px rgba(100, 100, 100, 0.4);
+}
+
+/* Result Section */
+.bmi-result {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #ddd;
+}
+
+.bmi-result h3 {
+  color: #ff1313; /* Red result header */
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.bmi-result p {
+  font-weight: bold;
+  color: white;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .bmi-container {
+    padding: 4em 1em;
   }
-  
-  /* Header */
+
   .bmi-container h2 {
-    text-align: center;
-    color: #ff1313; /* Red color for header */
-    font-size: 50px;
-    margin-bottom: 20px;
+    font-size: 2rem;
   }
-  
-  /* Form Styling */
-  .bmi-container .form-group {
-    margin-bottom: 20px;
+
+  .bmi-container form {
+    padding: 15px;
   }
-  
-  .bmi-container .form-group label {
-    font-size: 1.5em;
-    display: block;
-    font-weight: 500;
-    margin-bottom: 5px;
-    color: #fff;
-  }
-  
-  .bmi-container form{
-    width: 50%;
-    margin: 0 auto;
-  }
-  
-  .bmi-container .form-group input {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-top: 5px;
-  }
-  
-  .bmi-container .form-group input:focus {
-    border-color: #ff1313; /* Red border color on focus */
-    outline: none;
-  }
-  
-  /* Buttons */
+
   .bmi-container button {
-    width: 48%;
-    padding: 12px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #ff1313; /* Red button */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s;
+    width: 100%;
+    margin-left: 0;
+    margin-top: 15px;
   }
-  
-  .bmi-container button:hover {
-    background-color: #ff1313; /* Darker red on hover */
-  }
-  
-  .bmi-container button[type="button"] {
-    background-color: #333; /* Black reset button */
-    margin-left: 4%;
-  }
-  
-  .bmi-container button[type="button"]:hover {
-    background-color: #555; /* Lighter black on hover */
-  }
-  
-  /* Result Section */
-  .bmi-result {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 18px;
-  }
-  
-  .bmi-result h3 {
-    color: #ff1313; /* Red color for result text */
-  }
-  
-  .bmi-result p {
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  .bmi-result p {
-    font-size: 16px;
-  }
+}

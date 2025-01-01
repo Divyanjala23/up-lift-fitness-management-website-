@@ -6,7 +6,7 @@ import Signup from './components/Signup';
 import Slider from './components/Slider';
 import Login from './components/Login';
 import Forum from './components/Forum';
-
+import About from './components/About';
 function App() {
   return (
     <Router>
@@ -16,6 +16,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login/>}/>
         <Route path="/forum" element={<div><Forum /></div>}/>
+        <Route path="/about" element={<div><About /></div>}/>
 
       
       </Routes>
