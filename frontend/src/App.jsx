@@ -7,7 +7,7 @@ import Slider from './components/Slider';
 import Login from './components/Login';
 import Forum from './components/Forum';
 import About from './components/About';
-import Dashboard from './components/Dashboard';
+// import Dashboard from './components/Dashboard';
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/forum" element={<div><Forum /></div>}/>
         <Route path="/about" element={<div><About /></div>}/>
-        <Route path="/dashboard" element={<div><Dashboard /></div>}/>
+        {/* <Route path="/dashboard" element={<div><Dashboard /></div>}/> */}
         
 
       
