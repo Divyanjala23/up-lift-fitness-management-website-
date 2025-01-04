@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import axios from "axios"; // Import axios
 import '../assets/css/signUp.css';
 
 const Signup = () => {
   const [selectedRole, setSelectedRole] = useState(null); // State to manage selected role
   const [formData, setFormData] = useState({
-    fullname: "",
+    fullName: "",
     email: "",
     experience: "",
     specialization: "",
@@ -13,16 +14,34 @@ const Signup = () => {
     username: "",
     password: "",
   });
+  const [statusMessage, setStatusMessage] = useState(""); // State to show success/error messages
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(`${selectedRole} Registration Data:`, formData);
+    try {
+      const payload = { ...formData, role: selectedRole };
+      const apiUrl = selectedRole === "Coach"
+        ? "http://localhost:8080/api/coaches/signup"
+        : "http://localhost:8080/api/members/signup"; // Use different URLs for Coach and Member
+  
+      const response = await axios.post(apiUrl, payload);
+  
+      if (response.status === 201 || response.status === 200) {
+        setStatusMessage("Registration successful!");
+      } else {
+        setStatusMessage("Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      setStatusMessage("An error occurred. Please try again.");
+    }
   };
+  
 
   return (
     <div className="signup-main">
@@ -31,25 +50,24 @@ const Signup = () => {
           <div className="role-selection">
             <h2 className="form-header">Select Role</h2>
             <button className="buttonm" onClick={() => setSelectedRole("Coach")}>
-              {/* <img src="/path/to/coach-icon.png" alt="Coach Icon" /> */}
               COACH
             </button>
             <button className="buttonm" onClick={() => setSelectedRole("Member")}>
-              {/* <img src="/path/to/member-icon.png" alt="Member Icon" /> */}
               MEMBER
             </button>
           </div>
         ) : (
           <div className="form-container">
             <h2 className="section-title">{selectedRole} Registration</h2>
+            {statusMessage && <p className="status-message">{statusMessage}</p>} {/* Display status messages */}
             <form onSubmit={handleSubmit} className="signup-form">
               <div className="form-group">
                 <label>Full Name</label>
                 <input
                   type="text"
-                  name="fullname"
+                  name="fullName"
                   placeholder="Full Name"
-                  value={formData.fullname}
+                  value={formData.fullName}
                   onChange={handleInputChange}
                   className="form-input"
                   required
@@ -86,21 +104,25 @@ const Signup = () => {
 
                   <div className="form-group">
                     <label>Specialization</label>
-                    <input
-                      type="text"
+                    <select
                       name="specialization"
-                      placeholder="Specialization"
                       value={formData.specialization}
                       onChange={handleInputChange}
                       className="form-input"
                       required
-                    />
+                    >
+                       <option value="">Select Specialization</option>
+                      <option value="Sports-Specific Training">Sports-Specific Training</option>
+                      <option value="Cardio Training">Cardio Training
+                      </option>
+                      <option value="Strength and Conditioning">Strength and Conditioning</option>
+                      <option value="Yoga and Flexibility Training">Yoga and Flexibility Training</option>
+                      <option value="Weight Loss Coaching">Weight Loss Coaching</option>
+                    </select>
                   </div>
                 </>
               )}
 
-              {selectedRole === "Member" && (
-                <>
                   <div className="form-group">
                     <label>Age</label>
                     <input
@@ -129,8 +151,8 @@ const Signup = () => {
                       <option value="Other">Other</option>
                     </select>
                   </div>
-                </>
-              )}
+                
+              
 
               <div className="form-group">
                 <label>Username</label>
