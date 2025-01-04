@@ -7,10 +7,8 @@ import Slider from './components/Slider';
 import Login from './components/Login';
 import Forum from './components/Forum';
 import About from './components/About';
-<<<<<<< HEAD
-=======
+import Dashboard from './components/Dashboard';
 
->>>>>>> 7ddbd9a28e129308c3a6aa4045d71a533516166e
 function App() {
   return (
     <Router>
@@ -21,6 +19,8 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/forum" element={<div><Forum /></div>}/>
         <Route path="/about" element={<div><About /></div>}/>
+        <Route path="/dashboard" element={<div><Dashboard /></div>}/>
+        
 
       
       </Routes>
