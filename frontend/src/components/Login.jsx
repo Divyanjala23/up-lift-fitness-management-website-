@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../assets/css/login.css';
 
 const Login = () => {
     const [formData, setFormData] = useState({
-        email: '',
+        username: '',
         password: ''
     });
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    // Handle input changes and update form data
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -16,11 +19,37 @@ const Login = () => {
         });
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Login Submitted:', formData);
-        // You can add login submission logic here, e.g., sending the data to an API
+        try {
+            const response = await axios.post('http://localhost:8080/api/login', {
+                username: formData.username,
+                password: formData.password
+            });
+    
+            const user = response.data;
+    
+            console.log('Backend Response:', user);  // Check the entire response structure
+    
+            // Make sure the role is being saved here, not the username
+            localStorage.setItem('userRole', user.role);  // Save the role instead of username
+    
+            // Redirect based on role
+            if (user.role === 'ADMIN') {
+                navigate('/admin/dashboard');
+            } else if (user.role === 'COACH') {
+                navigate('/coach/dashboard');
+            } else if (user.role === 'MEMBER') {
+                navigate('/member/dashboard');
+            }
+        } catch (err) {
+            console.error('Error occurred:', err);
+            setError(
+                err.response && err.response.data && err.response.data.message
+                    ? err.response.data.message
+                    : 'Something went wrong. Please try again.'
+            );
+        }
     };
 
     return (
@@ -28,19 +57,17 @@ const Login = () => {
             <div className="container">
                 <h2 className="form-header">Log In</h2>
             </div>
-
             <div className="form-container">
                 <div className="form-title">
                     <h2 className="section-title">Welcome Back</h2>
                 </div>
-
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
                         <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={formData.email}
+                            type="text"
+                            name="username"
+                            placeholder="username"
+                            value={formData.username}
                             onChange={handleChange}
                             required
                             className="form-input"
@@ -57,6 +84,7 @@ const Login = () => {
                             className="form-input"
                         />
                     </div>
+                    {error && <p className="error-message">{error}</p>}
                     <div className="submit-info">
                         <button className="btn" type="submit">
                             Log In
