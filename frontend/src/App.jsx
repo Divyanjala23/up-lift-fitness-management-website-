@@ -7,10 +7,6 @@ import Slider from './components/Slider';
 import Login from './components/Login';
 import Forum from './components/Forum';
 import About from './components/About';
-<<<<<<< HEAD
-import Service from './components/service';
-// import Dashboard from './components/Dashboard';
-=======
 import AdminDashboard from './components/AdminDashboard';
 import CoachDashboard from './components/CoachDashboard';
 import MemberDashboard from './components/MemberDashboard';
@@ -48,7 +44,6 @@ const ConditionalHeader = () => {
 
   return <Header />; // Render Header for other pages
 };
->>>>>>> e57444e9d79b3f44bd9039bf82ca43e93ebaf546
 
 function App() {
   return (
@@ -56,23 +51,12 @@ function App() {
       {/* Conditionally render Header based on route */}
       <ConditionalHeader />
       <Routes>
-<<<<<<< HEAD
-        <Route path="/" element={<div><Slider /><BMICalculator /><Service/><Footer /></div>} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/forum" element={<div><Forum /></div>}/>
-        <Route path="/about" element={<div><About /></div>}/>
-        <Route path="/service" element={<div><Service /></div>}/>
-        {/* <Route path="/dashboard" element={<div><Dashboard /></div>}/> */}
-        
-=======
         {/* Public Routes */}
         <Route path="/" element={<div><Slider /><BMICalculator /><Footer /></div>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forum" element={<div><Forum /></div>} />
         <Route path="/about" element={<div><About /></div>} />
->>>>>>> e57444e9d79b3f44bd9039bf82ca43e93ebaf546
 
         {/* Protected Routes for Dashboards */}
         <Route
