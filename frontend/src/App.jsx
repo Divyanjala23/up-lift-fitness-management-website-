@@ -7,6 +7,7 @@ import Slider from './components/Slider';
 import Login from './components/Login';
 import Forum from './components/Forum';
 import About from './components/About';
+import Service from './components/service';
 // import Dashboard from './components/Dashboard';
 
 function App() {
@@ -14,11 +15,12 @@ function App() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<div><Slider /><BMICalculator /><Footer /></div>} />
+        <Route path="/" element={<div><Slider /><BMICalculator /><Service/><Footer /></div>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login/>}/>
         <Route path="/forum" element={<div><Forum /></div>}/>
         <Route path="/about" element={<div><About /></div>}/>
+        <Route path="/service" element={<div><Service /></div>}/>
         {/* <Route path="/dashboard" element={<div><Dashboard /></div>}/> */}
         
 

@@ -1,79 +1,69 @@
-import React, { useState } from 'react';
-import '../assets/css/BMICalculator.css';
+import React, { useState } from "react";
+import "../assets/css/BMICalculator.css";
 
 const BMICalculator = () => {
-  const [weight, setWeight] = useState('');
-  const [height, setHeight] = useState('');
-  const [bmi, setBmi] = useState(null);
-  const [bmiCategory, setBmiCategory] = useState('');
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [age, setAge] = useState("");
+  const [bmi, setBMI] = useState(null);
+  const [status, setStatus] = useState("");
 
-  // Function to handle form submission
-  const calculateBMI = (e) => {
-    e.preventDefault();
-    const heightInMeters = height / 100; // Convert height to meters
-    const calculatedBMI = weight / (heightInMeters * heightInMeters);
-    setBmi(calculatedBMI.toFixed(2));
-    determineCategory(calculatedBMI);
+  const calculateBMI = () => {
+    if (!height || !weight) return;
+
+    const heightInMeters = height / 100;
+    const bmiValue = (weight / (heightInMeters * heightInMeters)).toFixed(1);
+    setBMI(bmiValue);
+    determineStatus(bmiValue);
   };
 
-  // Function to determine BMI category
-  const determineCategory = (calculatedBMI) => {
-    if (calculatedBMI < 18.5) {
-      setBmiCategory('Underweight');
-    } else if (calculatedBMI >= 18.5 && calculatedBMI < 24.9) {
-      setBmiCategory('Normal weight');
-    } else if (calculatedBMI >= 25 && calculatedBMI < 29.9) {
-      setBmiCategory('Overweight');
-    } else {
-      setBmiCategory('Obesity');
-    }
-  };
-
-  // Function to reset the form
-  const resetForm = () => {
-    setWeight('');
-    setHeight('');
-    setBmi(null);
-    setBmiCategory('');
+  const determineStatus = (bmiValue) => {
+    if (bmiValue < 16) setStatus("Severely Underweight");
+    else if (bmiValue < 17) setStatus("Underweight");
+    else if (bmiValue < 18.5) setStatus("Normal");
+    else if (bmiValue < 25) setStatus("Overweight");
+    else if (bmiValue < 30) setStatus("Obese Class I");
+    else if (bmiValue < 40) setStatus("Obese Class II");
+    else setStatus("Obese Class III");
   };
 
   return (
-    <div
-      className="bmi-container"
-
-    >
+    <div className="bmi-calculator">
       <h2>BMI Calculator</h2>
-      <form onSubmit={calculateBMI}>
-        <div className="form-group">
-          <label htmlFor="weight">Weight (kg):</label>
-          <input
-            type="number"
-            id="weight"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="height">Height (cm):</label>
-          <input
-            type="number"
-            id="height"
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Calculate BMI</button>
-        <button type="button" onClick={resetForm} style={{ marginLeft: '10px' }}>
-          Reset
-        </button>
-      </form>
-
+      <div className="input-group">
+        <label>Height (cm)</label>
+        <input
+          type="number"
+          value={height}
+          onChange={(e) => setHeight(e.target.value)}
+          placeholder="Enter height in cm"
+        />
+      </div>
+      <div className="input-group">
+        <label>Weight (kg)</label>
+        <input
+          type="number"
+          value={weight}
+          onChange={(e) => setWeight(e.target.value)}
+          placeholder="Enter weight in kg"
+        />
+      </div>
+      <div className="input-group">
+        <label>Age</label>
+        <input
+          type="number"
+          value={age}
+          onChange={(e) => setAge(e.target.value)}
+          placeholder="Enter age"
+        />
+      </div>
+      <button className="calculate-btn" onClick={calculateBMI}>
+        Calculate
+      </button>
       {bmi && (
-        <div className="bmi-result">
+        <div className="result">
           <h3>Your BMI: {bmi}</h3>
-          <p>Category: {bmiCategory}</p>
+          <h4>Status: {status}</h4>
         </div>
       )}
     </div>
