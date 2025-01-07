@@ -1,5 +1,6 @@
 /* Container for the detail section */
 .details-container {
+    margin-left: 25rem;
     padding: 1rem 2rem;
     background-color: #f8f9fa; /* Adjust as needed */
   }
@@ -314,6 +315,7 @@
   /* General Styles for Table Container */
 .table-container {
     padding: 1rem 2rem;
+    margin-left: 25rem;
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
@@ -323,12 +325,12 @@
   .table-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 1rem;
   }
   
   .table-column {
     flex: 1;
-    min-width: 300px;
+    min-width: 617px;
     max-width: 48%;
   }
   
@@ -380,6 +382,7 @@
 .todo-container {
     max-width: 400px;
     margin: 1rem auto;
+    margin-left: 27rem;
   }
   
   /* Wrapper */
