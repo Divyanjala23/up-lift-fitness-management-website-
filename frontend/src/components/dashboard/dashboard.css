@@ -1,0 +1,473 @@
+/* Container for the detail section */
+.details-container {
+    padding: 1rem 2rem;
+    background-color: #f8f9fa; /* Adjust as needed */
+  }
+  
+  /* Row styling */
+  .details-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  /* Individual item */
+  .details-item {
+    flex: 1 1 calc(25% - 1rem); /* Responsive: 4 items per row */
+    min-width: 200px;
+  }
+  
+  /* Card styling */
+  .details-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #343a40; /* Dark background */
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Icon styling */
+  .details-icon {
+    font-size: 3rem;
+    color: #dc3545; /* Red accent */
+  }
+  
+  /* Info section */
+  .details-info {
+    margin-left: 1rem;
+  }
+  
+  .details-title {
+    margin: 0;
+    font-size: 1rem;
+    color: #adb5bd; /* Muted text color */
+  }
+  
+  .details-value {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  
+  /* Navbar Container */
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #343a40; /* Dark background */
+    padding: 0.5rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Brand Logo */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar-logo {
+    font-size: 2rem;
+    color: #0d6efd; /* Primary blue */
+    margin: 0;
+}
+
+/* Sidebar Toggler */
+.sidebar-toggler {
+    font-size: 1.5rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    margin-left: 1rem;
+}
+
+.search-input {
+    background-color: #212529; /* Darker background */
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+}
+
+/* Navbar Items */
+.navbar-items {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Dropdown Styles */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropdown-label {
+    display: none;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #343a40;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    display: none;
+    z-index: 1000;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-item {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropdown-divider {
+    border-color: #495057;
+    margin: 0.5rem 0;
+}
+
+.dropdown-footer {
+    text-align: center;
+    color: #adb5bd; /* Muted text */
+}
+
+/* Profile Dropdown */
+.profile-name {
+    color: #fff;
+}
+
+
+/* Sidebar Container */
+.sidebar-container {
+    width: 250px;
+    background-color: #343a40; /* Dark background */
+    height: 100vh;
+    padding: 1rem;
+    position: fixed;
+  }
+  
+  /* Sidebar Navigation */
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* Brand Section */
+  .sidebar-brand {
+    text-decoration: none;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .sidebar-logo {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .sidebar-icon {
+    margin-right: 0.5rem;
+    color: #0d6efd; /* Primary blue */
+  }
+  
+  /* User Section */
+  .user-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .user-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #495057;
+  }
+  
+  .user-status-indicator {
+    width: 10px;
+    height: 10px;
+    border: 2px solid #fff;
+    background-color: #28a745; /* Green indicator */
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-radius: 50%;
+  }
+  
+  .user-info {
+    color: #adb5bd; /* Muted text */
+  }
+  
+  .user-name {
+    font-size: 0.875rem;
+    margin: 0;
+    color: #fff;
+  }
+  
+  .user-role {
+    font-size: 0.75rem;
+  }
+  
+  /* Sidebar Links */
+  .sidebar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .sidebar-link {
+    text-decoration: none;
+    color: #adb5bd; /* Muted text */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.3s;
+  }
+  
+  .sidebar-link.active,
+  .sidebar-link:hover {
+    background-color: #495057;
+    color: #fff;
+  }
+  
+  .link-icon {
+    font-size: 1rem;
+  }
+  
+  /* Dropdown Menu */
+  .sidebar-dropdown {
+    position: relative;
+  }
+  
+  .sidebar-dropdown-toggle {
+    text-decoration: none;
+    color: #adb5bd;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+  
+  .sidebar-dropdown-menu {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 1.5rem;
+  }
+  
+  .sidebar-dropdown:hover .sidebar-dropdown-menu {
+    display: flex;
+  }
+  
+  .sidebar-dropdown-item {
+    text-decoration: none;
+    color: #adb5bd;
+    padding: 0.5rem;
+    transition: color 0.3s;
+  }
+  
+  
+
+
+
+  .sidebar-dropdown-item:hover {
+    color: #fff;
+  }
+  
+  
+
+  /* General Styles for Table Container */
+.table-container {
+    padding: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  
+  /* Row and Column Layout */
+  .table-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  
+  .table-column {
+    flex: 1;
+    min-width: 300px;
+    max-width: 48%;
+  }
+  
+  /* Table Wrapper */
+  .table-wrapper {
+    background-color: #343a40;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .table-title {
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  
+  /* Table Styles */
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #adb5bd;
+  }
+  
+  .custom-table thead th {
+    border-bottom: 2px solid #495057;
+    text-align: left;
+    padding: 0.75rem;
+  }
+  
+  .custom-table tbody td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #495057;
+  }
+  
+  /* Striped Rows */
+  .custom-striped tbody tr:nth-child(odd) {
+    background-color: #495057;
+  }
+  
+  /* Hover Effect */
+  .custom-table tbody tr:hover {
+    background-color: #6c757d;
+    cursor: pointer;
+  }
+
+  
+
+  /* Container for Todo */
+.todo-container {
+    max-width: 400px;
+    margin: 1rem auto;
+  }
+  
+  /* Wrapper */
+  .todo-wrapper {
+    background-color: #343a40;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  /* Header */
+  .todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .todo-title {
+    font-size: 1rem;
+    color: #fff;
+  }
+  
+  .todo-link {
+    font-size: 0.9rem;
+    color: #0d6efd;
+    text-decoration: none;
+  }
+  
+  /* Input Area */
+  .todo-input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .todo-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #495057;
+    background-color: #212529;
+    color: #adb5bd;
+    border-radius: 4px;
+  }
+  
+  .todo-add-btn {
+    padding: 0.5rem 1rem;
+    background-color: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .todo-add-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Todo Items */
+  .todo-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #495057;
+    padding: 0.5rem 0;
+  }
+  
+  .todo-checkbox {
+    margin-right: 0.5rem;
+  }
+  
+  .todo-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .todo-text {
+    color: #adb5bd;
+  }
+  
+  .todo-delete-btn {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+  }
+  
+  .todo-delete-btn:hover {
+    color: #ff6b6b;
+  }
+  

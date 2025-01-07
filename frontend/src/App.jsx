@@ -16,6 +16,8 @@ const isAuthenticated = () => {
   return localStorage.getItem('userRole') !== null; // Check if userRole exists in localStorage
 };
 
+
+
 // PrivateRoute Component for role-based access
 const PrivateRoute = ({ children, role }) => {
   const userRole = localStorage.getItem('userRole'); // Get user role from localStorage
@@ -35,10 +37,11 @@ const PrivateRoute = ({ children, role }) => {
 const ConditionalHeader = () => {
   const location = useLocation(); // Get the current route path
 
-  // If the path matches one of the dashboard routes, don't show the Header
-  if (location.pathname.startsWith('/admin/dashboard') || 
-      location.pathname.startsWith('/coach/dashboard') || 
-      location.pathname.startsWith('/member/dashboard')) {
+  if (
+    location.pathname.startsWith('/admin/dashboard') || 
+    location.pathname.startsWith('/coach/dashboard') || 
+    location.pathname.startsWith('/member/dashboard')
+  ) {
     return null; // Do not render Header for dashboard pages
   }
 
@@ -84,7 +87,6 @@ function App() {
           }
         />
       </Routes>
-      
     </Router>
   );
 }
