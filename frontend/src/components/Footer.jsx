@@ -1,84 +1,124 @@
-import React, { PureComponent } from 'react';
-import backgroundImage from '../assets/img/gallery/section_bg03.png';
-import Logo from '../assets/img/logo/logo.png'; 
-import '../assets/css/footer.css'
+import React from "react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock
+} from "lucide-react";
 
-export class Footer extends PureComponent {
-  render() {
-    return (
-      <div
-        className="footer-area section-bg"
-      >
-        <div className="container">
-          <div className="footer-top footer-padding">
-            <div className="row d-flex justify-content-between">
-              <div className="col-xl-2 col-lg-2 col-md-4 col-sm-6">
-                <div className="single-footer-caption mb-50">
-                  <div className="footer-tittle">
-                    <h4>COMPANY</h4>
-                    <ul>
-                      <li><a href="#">About Us</a></li>
-                      <li><a href="#">Company</a></li>
-                      <li><a href="#">Press & Blog</a></li>
-                      <li><a href="#">Privacy Policy</a></li>
-                    </ul>
-                  </div>
-                </div>
+const Footer = () => {
+  return (
+    <div>
+      {/* Footer */}
+      <footer className="bg-gradient-to-b from-gray-900 to-black pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
+            <div>
+              <h4 className="text-xl font-bold text-white mb-6 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-1 after:bg-red-500 after:-mb-2">
+                Quick Links
+              </h4>
+              <ul className="space-y-4">
+                <li>
+                  <a
+                    href="#about"
+                    className="text-gray-400 hover:text-red-500 transition-all duration-300"
+                  >
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#classes"
+                    className="text-gray-400 hover:text-red-500 transition-all duration-300"
+                  >
+                    Classes
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#trainers"
+                    className="text-gray-400 hover:text-red-500 transition-all duration-300"
+                  >
+                    Trainers
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#membership"
+                    className="text-gray-400 hover:text-red-500 transition-all duration-300"
+                  >
+                    Membership
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xl font-bold text-white mb-6 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-1 after:bg-red-500 after:-mb-2">
+                Contact Info
+              </h4>
+              <div className="space-y-4 text-gray-400">
+                <p className="flex items-center gap-3">
+                  <Phone className="w-4 h-4" /> +1 (555) 123-4567
+                </p>
+                <p className="flex items-center gap-3">
+                  <Mail className="w-4 h-4" /> info@upliftgym.com
+                </p>
+                <p className="flex items-center gap-3">
+                  <MapPin className="w-4 h-4" /> 123 Fitness Avenue, NY
+                </p>
+                <p className="flex items-center gap-3">
+                  <Clock className="w-4 h-4" /> Open 5am - 11pm
+                </p>
               </div>
-              <div className="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                <div className="single-footer-caption mb-50">
-                  <div className="footer-tittle">
-                    <h4>Open hour</h4>
-                    <ul>
-                      <li><a href="#">Monday 11am-7pm</a></li>
-                      <li><a href="#">Tuesday-Friday 11am-8pm</a></li>
-                      <li><a href="#">Saturday 10am-6pm</a></li>
-                      <li><a href="#">Sunday 11am-6pm</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                <div className="single-footer-caption mb-50">
-                  <div className="footer-tittle">
-                    <h4>RESOURCES</h4>
-                    <ul>
-                      <li><a href="#">Home Insurance</a></li>
-                      <li><a href="#">Travel Insurance</a></li>
-                      <li><a href="#">Car Insurance</a></li>
-                      <li><a href="#">Business Insurance</a></li>
-                      <li><a href="#">Health Insurance</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-xl-3 col-lg-4 col-md-5 col-sm-6">
-                <div className="single-footer-caption mb-50">
-                  <div className="footer-logo">
-                    {/* Replacing hardcoded logo with imported Logo */}
-                    <a href="index.html">
-                      <img className='img-fluid' src={Logo} alt="Logo" />
-                      </a>
-                  </div>
-                  <div className="footer-tittle">
-                    <div className="footer-pera">
-                      <p className="info1">The trade war currently ensuing between the US and several nations around the globe, most fiercely with...</p>
-                    </div>
-                  </div>
-                  <div className="footer-social">
-                    <a href="https://www.facebook.com/sai4ull"><i className="fab fa-facebook-f"></i></a>
-                    <a href="#"><i className="fab fa-twitter"></i></a>
-                    <a href="#"><i className="fas fa-globe"></i></a>
-                    <a href="#"><i className="fab fa-instagram"></i></a>
-                  </div>
-                </div>
+            </div>
+            <div>
+              <h4 className="text-xl font-bold text-white mb-6 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-1 after:bg-red-500 after:-mb-2">
+                Newsletter
+              </h4>
+              <p className="text-gray-400 mb-6">
+                Subscribe to get updates on special offers and events.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="email"
+                  placeholder="Your email address"
+                  className="flex-1 px-4 py-3 bg-black/20 border border-gray-800 rounded-lg text-white focus:border-red-500 focus:outline-none"
+                />
+                <button className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300">
+                  Subscribe
+                </button>
               </div>
             </div>
           </div>
+          <div className="pt-8 border-t border-gray-800 text-center">
+            <div className="flex flex-col sm:flex-row justify-center gap-8 mb-4">
+              <a
+                href="#privacy"
+                className="text-gray-400 hover:text-red-500 transition-all duration-300"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="#terms"
+                className="text-gray-400 hover:text-red-500 transition-all duration-300"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="#faq"
+                className="text-gray-400 hover:text-red-500 transition-all duration-300"
+              >
+                FAQ
+              </a>
+            </div>
+            <p className="text-gray-400">
+              © 2025 Uplift Gym. All rights reserved.
+            </p>
+          </div>
         </div>
-      </div>
-    );
-  }
-}
+      </footer>
+    </div>
+  );
+};
 
 export default Footer;
