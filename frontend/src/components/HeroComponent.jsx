@@ -23,7 +23,7 @@ const HeroComponent = () => {
 
         {/* Content */}
         <motion.div
-          className="relative z-20 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-6"
+          className="relative z-20 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 mt-16"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 1 }}
