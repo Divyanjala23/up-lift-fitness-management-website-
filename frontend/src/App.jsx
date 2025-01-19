@@ -11,6 +11,7 @@ import SignInComponent from "./components/SignInComponent";
 // import Services from "./components/Services";
 // import Schedule from "./components/Shedule";
 import Footer from "./components/Footer";
+import AdminDashboard from "./components/AdminDashboard";
 
 const App = () => {
   return (
@@ -91,6 +92,14 @@ const App = () => {
               </> 
             }
           /> */}
+          <Route
+            path="/admin"
+            element={
+              <>
+                <AdminDashboard/>
+              </>
+            }
+          />
         </Routes>
       </Router>
     </>
