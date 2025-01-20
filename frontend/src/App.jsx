@@ -8,7 +8,7 @@ import SIgnUpComponent from "./components/SIgnUpComponent";
 import SignInComponent from "./components/SignInComponent";
 // import CommunityForum from "./components/CommunityForum";
 // import ContactUs from "./components/ContactUs";
-// import Services from "./components/Services";
+import Services from "./components/Services";
 // import Schedule from "./components/Shedule";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
@@ -65,7 +65,7 @@ const App = () => {
               </>
             }
           />
-          {/* <Route
+          <Route
             path="/services"
             element={
               <>
@@ -73,7 +73,7 @@ const App = () => {
                 <Services />
               </>
             }
-          /> */}
+          />
           {/* <Route
             path="/community"
             element={
