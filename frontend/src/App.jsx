@@ -6,7 +6,7 @@ import BMICalculatorComponent from "./components/BMICalculatorComponent";
 import About from "./components/About";
 import SIgnUpComponent from "./components/SIgnUpComponent";
 import SignInComponent from "./components/SignInComponent";
-// import CommunityForum from "./components/CommunityForum";
+import CommunityForum from "./components/CommunityForum";
 // import ContactUs from "./components/ContactUs";
 import Services from "./components/Services";
 // import Schedule from "./components/Shedule";
@@ -74,7 +74,7 @@ const App = () => {
               </>
             }
           />
-          {/* <Route
+          <Route
             path="/community"
             element={
               <>
@@ -82,7 +82,7 @@ const App = () => {
                 <CommunityForum />
               </>
             }
-          /> */}
+          />
           {/* <Route
             path="/schedule"
             element={
