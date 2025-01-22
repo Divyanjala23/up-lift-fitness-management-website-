@@ -7,9 +7,9 @@ import About from "./components/About";
 import SIgnUpComponent from "./components/SIgnUpComponent";
 import SignInComponent from "./components/SignInComponent";
 import CommunityForum from "./components/CommunityForum";
-// import ContactUs from "./components/ContactUs";
+import ContactUs from "./components/ContactUs";
 import Services from "./components/Services";
-// import Schedule from "./components/Shedule";
+import Schedule from "./components/Shedule";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
 
@@ -38,7 +38,7 @@ const App = () => {
               </>
             }
           />
-          {/* <Route
+          <Route
             path="/contact"
             element={
               <>
@@ -46,7 +46,7 @@ const App = () => {
                 <ContactUs />
               </>
             }
-          /> */}
+          />
           <Route
             path="/signup"
             element={
@@ -83,7 +83,7 @@ const App = () => {
               </>
             }
           />
-          {/* <Route
+          <Route
             path="/schedule"
             element={
               <>
@@ -91,7 +91,7 @@ const App = () => {
                 <Schedule />
               </> 
             }
-          /> */}
+          />
           <Route
             path="/admin"
             element={

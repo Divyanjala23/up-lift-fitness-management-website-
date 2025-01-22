@@ -37,7 +37,7 @@ const ContactUs = () => {
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Call Us",
-      details: ["+1 (555) 123-4567", "+1 (555) 765-4321"],
+      details: ["+94 11 123 4567", "+94 71 234 5678"],
     },
     {
       icon: <Mail className="w-6 h-6" />,
@@ -47,7 +47,7 @@ const ContactUs = () => {
     {
       icon: <MapPin className="w-6 h-6" />,
       title: "Visit Us",
-      details: ["123 Fitness Avenue", "New York, NY 10001"],
+      details: ["123 Kandy Road", "Kelaniya, Western Province"],
     },
     {
       icon: <Clock className="w-6 h-6" />,
@@ -184,13 +184,13 @@ const ContactUs = () => {
             Our Location
           </h3>
           <p className="text-gray-400 leading-relaxed mb-4">
-            123 Fitness Avenue
+            123 Kandy Road
             <br />
-            New York, NY 10001
+            Kelaniya, Western Province
           </p>
           <p className="text-gray-400 leading-relaxed mb-6">
-            Located in the heart of Manhattan, our facility is easily accessible
-            by public transportation.
+            Located near the historic Kelaniya Raja Maha Vihara, our facility is easily accessible
+            from both Kandy Road and the Colombo-Katunayake Expressway.
           </p>
           <a
             href="https://maps.google.com"
@@ -203,7 +203,7 @@ const ContactUs = () => {
           </a>
         </div>
         <iframe
-          src="https://www.openstreetmap.org/export/embed.html?bbox=-74.006,40.712,-73.996,40.722&layer=mapnik"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=79.915,6.970,79.925,6.980&layer=mapnik"
           className="w-full h-full grayscale contrast-125 brightness-75 hover:grayscale-0 hover:contrast-100 hover:brightness-100 transition-all duration-300"
           frameBorder="0"
           allowFullScreen
