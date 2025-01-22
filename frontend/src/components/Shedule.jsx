@@ -25,6 +25,7 @@ const Schedule = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeFilter, setActiveFilter] = useState(null);
   const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
   const [favorites, setFavorites] = useState(new Set());
   const [isBooked, setIsBooked] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,7 +54,6 @@ const Schedule = () => {
     { name: "Cardio", color: "orange", icon: <Activity size={16} /> },
   ];
 
-  // Weekly schedule classes
   const weeklyClasses = [
     {
       id: 1,
@@ -96,10 +96,9 @@ const Schedule = () => {
       trending: true,
       participantCount: 8,
       calories: "300-400",
-    }
+    },
   ];
 
-  // Monthly schedule classes
   const monthlyClasses = [
     ...weeklyClasses,
     {
@@ -118,46 +117,107 @@ const Schedule = () => {
     },
   ];
 
-  // Filter and display classes based on active view and filter
   const getFilteredClasses = () => {
     const baseClasses = activeView === "weekly" ? weeklyClasses : monthlyClasses;
-    
-    return baseClasses
-      .filter(classItem => 
+    return baseClasses.filter(
+      (classItem) =>
         (!activeFilter || classItem.type === activeFilter) &&
-        (!searchQuery || 
+        (!searchQuery ||
           classItem.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           classItem.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          classItem.trainer.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      );
+          classItem.trainer.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  };
+
+  const showNotificationMessage = (message, duration = 2000) => {
+    setNotificationMessage(message);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), duration);
   };
 
   const handleFavorite = (classId) => {
-    setFavorites(prev => {
+    setFavorites((prev) => {
       const newFavorites = new Set(prev);
       if (newFavorites.has(classId)) {
         newFavorites.delete(classId);
+        showNotificationMessage("Removed from favorites!");
       } else {
         newFavorites.add(classId);
+        showNotificationMessage("Added to favorites!");
       }
       return newFavorites;
     });
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 2000);
   };
 
-  const handleBooking = (classId) => {
-    setIsBooked(prev => {
+  const handleBooking = (classId, spots) => {
+    if (spots === 0 && !isBooked.has(classId)) {
+      showNotificationMessage("Sorry, this class is full!");
+      return;
+    }
+
+    setIsBooked((prev) => {
       const newBookings = new Set(prev);
       if (newBookings.has(classId)) {
         newBookings.delete(classId);
+        showNotificationMessage("Booking cancelled!");
+        setUserProgress((prev) => ({
+          ...prev,
+          weeklyGoal: Math.max(prev.weeklyGoal - 1, 0),
+        }));
       } else {
         newBookings.add(classId);
+        showNotificationMessage("Class booked successfully!");
+        setUserProgress((prev) => ({
+          ...prev,
+          weeklyGoal: Math.min(prev.weeklyGoal + 1, 5),
+        }));
       }
       return newBookings;
     });
   };
+
+  const handleShare = (classItem) => {
+    const shareData = {
+      title: `Join me for ${classItem.name}!`,
+      text: `Join me for ${classItem.name} with ${classItem.trainer} at ${classItem.time}`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData)
+        .then(() => showNotificationMessage("Shared successfully!"))
+        .catch(() => showNotificationMessage("Sharing failed"));
+    } else {
+      showNotificationMessage("Sharing is not supported on this device");
+    }
+  };
+
+  const ProgressDashboard = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-gray-900/60 border border-red-500/20 rounded-lg p-6 backdrop-blur-lg mb-8"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="text-center">
+          <div className="text-gray-400 mb-2">Completed Workouts</div>
+          <div className="text-3xl font-bold">
+            {userProgress.completedWorkouts}
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="text-gray-400 mb-2">Calories Burned</div>
+          <div className="text-3xl font-bold">
+            {userProgress.caloriesBurned}
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="text-gray-400 mb-2">Weekly Goal Progress</div>
+          <div className="text-3xl font-bold">{userProgress.weeklyGoal}/5</div>
+        </div>
+      </div>
+    </motion.div>
+  );
 
   const ClassCard = ({ classItem }) => (
     <motion.div
@@ -169,7 +229,7 @@ const Schedule = () => {
       className="bg-gray-900/60 border border-red-500/20 rounded-lg p-6 backdrop-blur-lg"
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={`px-3 py-1 rounded-full text-sm font-semibold bg-${classItem.type.toLowerCase()}-500/20 text-${classItem.type.toLowerCase()}-500`}>
+        <div className={`px-3 py-1 rounded-full text-sm font-semibold bg-${classItem.color}-500/20 text-${classItem.color}-500`}>
           {classItem.type}
         </div>
         <motion.button
@@ -177,6 +237,7 @@ const Schedule = () => {
           whileTap={{ scale: 0.9 }}
           className="text-red-500"
           onClick={() => handleFavorite(classItem.id)}
+          aria-label={favorites.has(classItem.id) ? "Remove from favorites" : "Add to favorites"}
         >
           <Heart size={20} fill={favorites.has(classItem.id) ? "currentColor" : "none"} />
         </motion.button>
@@ -214,7 +275,8 @@ const Schedule = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="p-2 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700"
-            onClick={() => alert('Share feature coming soon!')}
+            onClick={() => handleShare(classItem)}
+            aria-label="Share class"
           >
             <Share2 size={16} />
           </motion.button>
@@ -224,40 +286,20 @@ const Schedule = () => {
             whileTap={{ scale: 0.95 }}
             className={`px-6 py-2 rounded-full font-semibold ${
               isBooked.has(classItem.id)
-                ? 'bg-green-500 text-white'
-                : 'bg-red-500 text-white hover:bg-red-600'
+                ? "bg-green-500 text-white"
+                : classItem.spots === 0
+                ? "bg-gray-500 text-white cursor-not-allowed"
+                : "bg-red-500 text-white hover:bg-red-600"
             }`}
-            onClick={() => handleBooking(classItem.id)}
+            onClick={() => handleBooking(classItem.id, classItem.spots)}
+            disabled={classItem.spots === 0 && !isBooked.has(classItem.id)}
           >
-            {isBooked.has(classItem.id) ? 'Booked!' : 'Book Now'}
+            {isBooked.has(classItem.id)
+              ? "Booked!"
+              : classItem.spots === 0
+              ? "Class Full"
+              : "Book Now"}
           </motion.button>
-        </div>
-      </div>
-    </motion.div>
-  );
-
-  const ProgressDashboard = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-gray-900/60 border border-red-500/20 rounded-lg p-6 backdrop-blur-lg mb-8"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="text-center">
-          <div className="text-gray-400 mb-2">Completed Workouts</div>
-          <div className="text-3xl font-bold">
-            {userProgress.completedWorkouts}
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-gray-400 mb-2">Calories Burned</div>
-          <div className="text-3xl font-bold">
-            {userProgress.caloriesBurned}
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-gray-400 mb-2">Weekly Goal Progress</div>
-          <div className="text-3xl font-bold">{userProgress.weeklyGoal}/5</div>
         </div>
       </div>
     </motion.div>
@@ -300,13 +342,14 @@ const Schedule = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-gradient-to-r from-red-700 to-red-500 text-white px-12 py-5 rounded-full font-semibold tracking-wider shadow-lg shadow-red-500/30"
+            onClick={() => document.getElementById('schedule').scrollIntoView({ behavior: 'smooth' })}
           >
             BOOK A CLASS NOW
           </motion.button>
         </motion.div>
       </motion.div>
 
-      <div className="relative py-32 bg-gradient-to-b from-black to-gray-900">
+      <div id="schedule" className="relative py-32 bg-gradient-to-b from-black to-gray-900">
         <div className="absolute inset-0 bg-red-500/10" />
 
         <div className="max-w-7xl mx-auto px-8">
@@ -328,7 +371,7 @@ const Schedule = () => {
                   }`}
                   onClick={() => {
                     setActiveView(view);
-                    setActiveFilter(null); // Reset filter when changing view
+                    setActiveFilter(null);
                   }}
                 >
                   {view.charAt(0).toUpperCase() + view.slice(1)} View
@@ -345,7 +388,7 @@ const Schedule = () => {
                 <input
                   type="text"
                   placeholder="Search classes..."
-                  className="bg-gray-800 text-white pl-10 pr-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="bg-gray-800 text-white pl-10 pr-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 w-64"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -378,41 +421,41 @@ const Schedule = () => {
                 whileTap={{ scale: 0.95 }}
                 className={`px-6 py-3 rounded-full border-2 ${
                   activeFilter === type.name
-                    ? 'bg-red-500 text-white border-red-500'
-                    : 'border-red-500/50 text-red-500 hover:bg-red-500/10'
+                    ? "bg-red-500 text-white border-red-500"
+                    : "border-red-500/50 text-red-500 hover:bg-red-500/10"
                 } flex items-center gap-2`}
                 onClick={() => setActiveFilter(activeFilter === type.name ? null : type.name)}
-                >
-                  {type.icon}
-                  {type.name}
-                </motion.button>
+              >
+                {type.icon}
+                {type.name}
+              </motion.button>
+            ))}
+          </motion.div>
+
+          <motion.div className="grid gap-6" layout>
+            <AnimatePresence>
+              {getFilteredClasses().map((classItem) => (
+                <ClassCard key={classItem.id} classItem={classItem} />
               ))}
-            </motion.div>
-  
-            <motion.div className="grid gap-6" layout>
-              <AnimatePresence>
-                {getFilteredClasses().map((classItem) => (
-                  <ClassCard key={classItem.id} classItem={classItem} />
-                ))}
-              </AnimatePresence>
-            </motion.div>
-          </div>
+            </AnimatePresence>
+          </motion.div>
         </div>
-  
-        <AnimatePresence>
-          {showNotification && (
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              className="fixed bottom-8 right-8 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg"
-            >
-              {favorites.size > 0 ? "Class added to favorites!" : "Removed from favorites!"}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
-    );
-  };
-  
-  export default Schedule;
+
+      <AnimatePresence>
+        {showNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-8 right-8 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg z-50"
+          >
+            {notificationMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default Schedule;
