@@ -4,24 +4,20 @@ import {
   Clock,
   Users,
   Search,
-  ChevronDown,
   Zap,
-  ArrowRight,
   Filter,
   User,
   Heart,
-  Calendar as CalendarIcon,
-  Trophy,
-  Bell,
   Activity,
-  Award,
+  Trophy,
   Share2,
+  Star,
+  Flame,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Schedule = () => {
-  const [activeView, setActiveView] = useState("weekly");
-  const [selectedClass, setSelectedClass] = useState(null);
+  const [activeView, setActiveView] = useState("recommended");
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeFilter, setActiveFilter] = useState(null);
   const [showNotification, setShowNotification] = useState(false);
@@ -29,23 +25,70 @@ const Schedule = () => {
   const [favorites, setFavorites] = useState(new Set());
   const [isBooked, setIsBooked] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState("");
-  const [userProgress, setUserProgress] = useState({
+
+  const [userProfile, setUserProfile] = useState({
+    name: "Alex Rodriguez",
+    age: 28,
+    fitnessLevel: "Intermediate",
+    goals: ["Weight Loss", "Muscle Tone"],
+    preferredWorkouts: ["HIIT", "Strength"],
+    restrictions: ["Lower Back Sensitivity"],
+    membershipTier: "Premium",
     completedWorkouts: 12,
     caloriesBurned: 3200,
     weeklyGoal: 4,
+    fitnessStreak: 15,
+    personalBests: {
+      weightLifted: 225,
+      cardioEndurance: 45,
+      yogaBalance: 15
+    }
   });
 
-  const userData = {
-    name: "Sarah",
-    level: "Advanced",
-    streak: 15,
-  };
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const recommendedClasses = [
+    {
+      id: 1,
+      name: "Power HIIT Pro",
+      type: "HIIT",
+      time: "07:00 AM",
+      trainer: "Alex Rivers",
+      spots: 8,
+      duration: "45 min",
+      intensity: userProfile.fitnessLevel === "Advanced" ? "High" : "Medium",
+      color: "red",
+      tailoredFor: userProfile.goals.includes("Weight Loss"),
+      calories: "400-500",
+      recommendationReason: "Perfect for your weight loss goals!"
+    },
+    {
+      id: 2,
+      name: "Core Strength Evolution",
+      type: "Strength",
+      time: "10:00 AM",
+      trainer: "Chris Parker",
+      spots: 10,
+      duration: "50 min",
+      intensity: "High",
+      color: "green",
+      tailoredFor: userProfile.goals.includes("Muscle Tone"),
+      calories: "300-400",
+      recommendationReason: "Targets muscle toning for your fitness goals"
+    },
+    {
+      id: 3,
+      name: "Gentle Flow with Modifications",
+      type: "Yoga",
+      time: "08:30 AM",
+      trainer: "Maya Chen",
+      spots: 5,
+      duration: "60 min",
+      intensity: "Low",
+      color: "blue",
+      tailoredFor: true,
+      calories: "200-300",
+      recommendationReason: "Low-impact class considering your back sensitivity"
+    }
+  ];
 
   const classTypes = [
     { name: "HIIT", color: "red", icon: <Activity size={16} /> },
@@ -54,80 +97,11 @@ const Schedule = () => {
     { name: "Cardio", color: "orange", icon: <Activity size={16} /> },
   ];
 
-  const weeklyClasses = [
-    {
-      id: 1,
-      name: "Power HIIT",
-      type: "HIIT",
-      time: "07:00 AM",
-      trainer: "Alex Rivers",
-      spots: 8,
-      duration: "45 min",
-      intensity: "High",
-      color: "red",
-      trending: true,
-      participantCount: 12,
-      calories: "400-500",
-    },
-    {
-      id: 2,
-      name: "Mindful Flow",
-      type: "Yoga",
-      time: "08:30 AM",
-      trainer: "Maya Chen",
-      spots: 5,
-      duration: "60 min",
-      intensity: "Medium",
-      color: "blue",
-      trending: false,
-      participantCount: 15,
-      calories: "200-300",
-    },
-    {
-      id: 3,
-      name: "Core Strength",
-      type: "Strength",
-      time: "10:00 AM",
-      trainer: "Chris Parker",
-      spots: 10,
-      duration: "50 min",
-      intensity: "High",
-      color: "green",
-      trending: true,
-      participantCount: 8,
-      calories: "300-400",
-    },
-  ];
-
-  const monthlyClasses = [
-    ...weeklyClasses,
-    {
-      id: 4,
-      name: "Cardio Blast",
-      type: "Cardio",
-      time: "09:00 AM",
-      trainer: "Jessica White",
-      spots: 12,
-      duration: "40 min",
-      intensity: "High",
-      color: "orange",
-      trending: true,
-      participantCount: 10,
-      calories: "350-450",
-    },
-  ];
-
-  const getFilteredClasses = () => {
-    const baseClasses = activeView === "weekly" ? weeklyClasses : monthlyClasses;
-    return baseClasses.filter(
-      (classItem) =>
-        (!activeFilter || classItem.type === activeFilter) &&
-        (!searchQuery ||
-          classItem.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          classItem.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          classItem.trainer.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  };
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const showNotificationMessage = (message, duration = 2000) => {
     setNotificationMessage(message);
@@ -160,17 +134,9 @@ const Schedule = () => {
       if (newBookings.has(classId)) {
         newBookings.delete(classId);
         showNotificationMessage("Booking cancelled!");
-        setUserProgress((prev) => ({
-          ...prev,
-          weeklyGoal: Math.max(prev.weeklyGoal - 1, 0),
-        }));
       } else {
         newBookings.add(classId);
         showNotificationMessage("Class booked successfully!");
-        setUserProgress((prev) => ({
-          ...prev,
-          weeklyGoal: Math.min(prev.weeklyGoal + 1, 5),
-        }));
       }
       return newBookings;
     });
@@ -192,34 +158,66 @@ const Schedule = () => {
     }
   };
 
-  const ProgressDashboard = () => (
+  const getFilteredClasses = () => {
+    let baseClasses = recommendedClasses;
+
+    return baseClasses.filter(
+      (classItem) =>
+        (activeView === "recommended" || activeView === classItem.type.toLowerCase()) &&
+        (!activeFilter || classItem.type === activeFilter) &&
+        (!searchQuery ||
+          classItem.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          classItem.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          classItem.trainer.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  };
+
+  const PersonalProgressDashboard = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-gray-900/60 border border-red-500/20 rounded-lg p-6 backdrop-blur-lg mb-8"
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
         <div className="text-center">
-          <div className="text-gray-400 mb-2">Completed Workouts</div>
-          <div className="text-3xl font-bold">
-            {userProgress.completedWorkouts}
+          <div className="text-gray-400 mb-2 flex items-center justify-center gap-2">
+            <Trophy size={20} className="text-yellow-500" />
+            Fitness Level
           </div>
+          <div className="text-xl font-bold">{userProfile.fitnessLevel}</div>
         </div>
         <div className="text-center">
-          <div className="text-gray-400 mb-2">Calories Burned</div>
-          <div className="text-3xl font-bold">
-            {userProgress.caloriesBurned}
+          <div className="text-gray-400 mb-2 flex items-center justify-center gap-2">
+            <Flame size={20} className="text-red-500" />
+            Calories Burned
           </div>
+          <div className="text-xl font-bold">{userProfile.caloriesBurned}</div>
         </div>
         <div className="text-center">
-          <div className="text-gray-400 mb-2">Weekly Goal Progress</div>
-          <div className="text-3xl font-bold">{userProgress.weeklyGoal}/5</div>
+          <div className="text-gray-400 mb-2 flex items-center justify-center gap-2">
+            <Trophy size={20} className="text-green-500" />
+            Weekly Goal
+          </div>
+          <div className="text-xl font-bold">{userProfile.weeklyGoal}/5</div>
+        </div>
+      </div>
+      <div className="mt-6 text-center">
+        <div className="text-gray-400 mb-2">Your Current Goals</div>
+        <div className="flex justify-center gap-2">
+          {userProfile.goals.map((goal) => (
+            <span 
+              key={goal} 
+              className="px-3 py-1 bg-red-500/20 text-red-500 rounded-full text-sm"
+            >
+              {goal}
+            </span>
+          ))}
         </div>
       </div>
     </motion.div>
   );
 
-  const ClassCard = ({ classItem }) => (
+  const PersonalClassCard = ({ classItem }) => (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
@@ -229,23 +227,41 @@ const Schedule = () => {
       className="bg-gray-900/60 border border-red-500/20 rounded-lg p-6 backdrop-blur-lg"
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={`px-3 py-1 rounded-full text-sm font-semibold bg-${classItem.color}-500/20 text-${classItem.color}-500`}>
+        <div className={`px-3 py-1 rounded-full text-sm font-semibold bg-${classItem.color}-500/20 text-${classItem.color}-500 flex items-center gap-2`}>
+          {classItem.icon || <Activity size={16} />}
           {classItem.type}
         </div>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="text-red-500"
-          onClick={() => handleFavorite(classItem.id)}
-          aria-label={favorites.has(classItem.id) ? "Remove from favorites" : "Add to favorites"}
-        >
-          <Heart size={20} fill={favorites.has(classItem.id) ? "currentColor" : "none"} />
-        </motion.button>
+        <div className="flex items-center gap-2">
+          {classItem.tailoredFor && (
+            <motion.div 
+              className="text-yellow-500 flex items-center gap-1"
+              whileHover={{ scale: 1.1 }}
+              title="Tailored for you"
+            >
+              <Star size={16} fill="currentColor" />
+              <span className="text-xs">Personalized</span>
+            </motion.div>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="text-red-500"
+            onClick={() => handleFavorite(classItem.id)}
+            aria-label={favorites.has(classItem.id) ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Heart size={20} fill={favorites.has(classItem.id) ? "currentColor" : "none"} />
+          </motion.button>
+        </div>
       </div>
 
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-bold mb-2">{classItem.name}</h3>
+          {classItem.recommendationReason && (
+            <p className="text-sm text-gray-400 italic mb-2">
+              {classItem.recommendationReason}
+            </p>
+          )}
           <div className="flex flex-wrap gap-4 text-gray-400">
             <div className="flex items-center gap-2">
               <Clock size={16} />
@@ -313,12 +329,6 @@ const Schedule = () => {
         transition={{ type: "spring", stiffness: 100 }}
       >
         <motion.div
-          className="absolute inset-0 bg-gradient-to-b from-black/80 via-red-600/30 to-black z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        />
-
-        <motion.div
           className="relative z-20 text-center max-w-6xl px-6"
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -331,12 +341,12 @@ const Schedule = () => {
           >
             <Zap size={32} className="text-red-500" />
             <span className="text-red-500 tracking-widest font-semibold text-lg">
-              Welcome back, {userData.name}!
+              Welcome back, {userProfile.name}!
             </span>
             <Zap size={32} className="text-red-500" />
           </motion.div>
 
-          <ProgressDashboard />
+          <PersonalProgressDashboard />
 
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -344,14 +354,12 @@ const Schedule = () => {
             className="bg-gradient-to-r from-red-700 to-red-500 text-white px-12 py-5 rounded-full font-semibold tracking-wider shadow-lg shadow-red-500/30"
             onClick={() => document.getElementById('schedule').scrollIntoView({ behavior: 'smooth' })}
           >
-            BOOK A CLASS NOW
+            FIND YOUR PERFECT CLASS
           </motion.button>
         </motion.div>
       </motion.div>
 
       <div id="schedule" className="relative py-32 bg-gradient-to-b from-black to-gray-900">
-        <div className="absolute inset-0 bg-red-500/10" />
-
         <div className="max-w-7xl mx-auto px-8">
           <motion.div
             className="flex flex-wrap items-center justify-between gap-6 mb-12"
@@ -359,13 +367,13 @@ const Schedule = () => {
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="flex items-center gap-4">
-              {["weekly", "monthly"].map((view) => (
+              {["Recommended", ...classTypes.map(type => type.name)].map((view) => (
                 <motion.button
                   key={view}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                    activeView === view
+                    activeView.toLowerCase() === view.toLowerCase()
                       ? "bg-red-500 text-white"
                       : "bg-gray-800 text-gray-300 hover:bg-red-500/50"
                   }`}
@@ -373,89 +381,89 @@ const Schedule = () => {
                     setActiveView(view);
                     setActiveFilter(null);
                   }}
-                >
-                  {view.charAt(0).toUpperCase() + view.slice(1)} View
-                </motion.button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-4">
-              <motion.div className="relative" whileHover={{ scale: 1.02 }}>
-                <Search
-                  size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  type="text"
-                  placeholder="Search classes..."
-                  className="bg-gray-800 text-white pl-10 pr-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 w-64"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </motion.div>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-800 rounded-full hover:bg-gray-700"
-                onClick={() => {
-                  setActiveFilter(null);
-                  setSearchQuery("");
-                }}
               >
-                <Filter size={20} />
-                Reset Filters
-              </motion.button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="flex flex-wrap gap-4 mb-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {classTypes.map((type) => (
-              <motion.button
-                key={type.name}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`px-6 py-3 rounded-full border-2 ${
-                  activeFilter === type.name
-                    ? "bg-red-500 text-white border-red-500"
-                    : "border-red-500/50 text-red-500 hover:bg-red-500/10"
-                } flex items-center gap-2`}
-                onClick={() => setActiveFilter(activeFilter === type.name ? null : type.name)}
-              >
-                {type.icon}
-                {type.name}
+                {view}
               </motion.button>
             ))}
-          </motion.div>
+          </div>
 
-          <motion.div className="grid gap-6" layout>
-            <AnimatePresence>
-              {getFilteredClasses().map((classItem) => (
-                <ClassCard key={classItem.id} classItem={classItem} />
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </div>
+          <div className="flex items-center gap-4">
+            <motion.div className="relative" whileHover={{ scale: 1.02 }}>
+              <Search
+                size={20}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                type="text"
+                placeholder="Search classes..."
+                className="bg-gray-800 text-white pl-10 pr-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 w-64"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </motion.div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-6 py-3 bg-gray-800 rounded-full hover:bg-gray-700"
+              onClick={() => {
+                setActiveFilter(null);
+                setSearchQuery("");
+              }}
+            >
+              <Filter size={20} />
+              Reset Filters
+            </motion.button>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="flex flex-wrap gap-4 mb-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          {classTypes.map((type) => (
+            <motion.button
+              key={type.name}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-6 py-3 rounded-full border-2 ${
+                activeFilter === type.name
+                  ? "bg-red-500 text-white border-red-500"
+                  : "border-red-500/50 text-red-500 hover:bg-red-500/10"
+              } flex items-center gap-2`}
+              onClick={() => setActiveFilter(activeFilter === type.name ? null : type.name)}
+            >
+              {type.icon}
+              {type.name}
+            </motion.button>
+          ))}
+        </motion.div>
+
+        <motion.div className="grid gap-6" layout>
+          <AnimatePresence>
+            {getFilteredClasses().map((classItem) => (
+              <PersonalClassCard key={classItem.id} classItem={classItem} />
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
-
-      <AnimatePresence>
-        {showNotification && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-8 right-8 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg z-50"
-          >
-            {notificationMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
-  );
+
+    <AnimatePresence>
+      {showNotification && (
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 50 }}
+          className="fixed bottom-8 right-8 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg z-50"
+        >
+          {notificationMessage}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
 };
 
 export default Schedule;
