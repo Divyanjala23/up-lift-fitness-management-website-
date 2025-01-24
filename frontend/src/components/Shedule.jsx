@@ -322,12 +322,15 @@ const Schedule = () => {
   );
 
   return (
-    <div className="bg-black text-white overflow-x-hidden font-inter">
+    <div className="bg-gradient-to-br from-gray-900 via-red-950 to-black text-white overflow-x-hidden font-inter">
       <motion.div
         className="relative h-screen flex items-center justify-center overflow-hidden"
-        style={{ y: isScrolled ? 50 : 0 }}
-        transition={{ type: "spring", stiffness: 100 }}
-      >
+        style={{ 
+          backgroundImage: 'linear-gradient(to bottom right, rgba(0,0,0,0.8), rgba(127,29,29,0.3))',
+          backgroundBlendMode: 'overlay'
+        }}
+      transition={{ type: "spring", stiffness: 100 }}
+    >
         <motion.div
           className="relative z-20 text-center max-w-6xl px-6"
           initial={{ y: 50, opacity: 0 }}
@@ -359,7 +362,16 @@ const Schedule = () => {
         </motion.div>
       </motion.div>
 
-      <div id="schedule" className="relative py-32 bg-gradient-to-b from-black to-gray-900">
+      <div 
+        id="schedule" 
+        className="relative py-32 bg-gradient-to-b from-gray-900 via-red-950 to-black"
+        style={{
+          backgroundImage: `
+            radial-gradient(at 20% 50%, rgba(220,38,38,0.1) 0px, transparent 50%),
+            radial-gradient(at 80% 0%, rgba(220,38,38,0.1) 0px, transparent 50%)
+          `,
+          backgroundBlendMode: 'soft-light'
+        }}>
         <div className="max-w-7xl mx-auto px-8">
           <motion.div
             className="flex flex-wrap items-center justify-between gap-6 mb-12"
