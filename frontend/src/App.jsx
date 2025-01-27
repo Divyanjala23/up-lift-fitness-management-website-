@@ -12,6 +12,8 @@ import Services from "./components/Services";
 import Schedule from "./components/Shedule";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
+import MemberDashboard from "./components/MemberDashboard";
+
 
 const App = () => {
   return (
@@ -97,6 +99,14 @@ const App = () => {
             element={
               <>
                 <AdminDashboard/>
+              </>
+            }
+          />
+          <Route
+            path="/member"
+            element={
+              <>
+                <MemberDashboard/>
               </>
             }
           />
