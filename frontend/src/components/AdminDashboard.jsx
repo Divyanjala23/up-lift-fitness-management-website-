@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { apiService } from "./apiservice";
 import {
   Users,
   Settings,
@@ -40,7 +41,7 @@ import MemberRegistrationForm from "./MemberRegistrationForm";
 import CoachRegistrationForm from "./CoachRegistrationForm";
 import Thumbnail from "../assets/images/Bgs/SignInImg.jpg";
 import VideoAddForm from "./VideoAddForm";
-
+// ... (keep existing imports)
 const StatsCard = ({ icon: Icon, label, value, trend }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
     <div className="flex items-start justify-between">
@@ -183,6 +184,8 @@ const MembersSection = ({ data, open, handleOpen }) => (
         <tr className="border-b border-red-500/20 text-left text-gray-400">
           <th className="px-4 py-3">Name</th>
           <th className="px-4 py-3">Email</th>
+          <th className="px-4 py-3">Age</th>
+          <th className="px-4 py-3">Gender</th>
           <th className="px-4 py-3">Status</th>
           <th className="px-4 py-3">Plan</th>
           <th className="px-4 py-3">Actions</th>
@@ -191,19 +194,21 @@ const MembersSection = ({ data, open, handleOpen }) => (
       <tbody>
         {data.map((member) => (
           <tr key={member.id} className="border-b border-red-500/10 text-white">
-            <td className="px-4 py-3">{member.name}</td>
+            <td className="px-4 py-3">{member.fullName}</td>
             <td className="px-4 py-3">{member.email}</td>
+            <td className="px-4 py-3">{member.age}</td>
+            <td className="px-4 py-3">{member.gender}</td>
             <td className="px-4 py-3">
-              <span
-                className={`rounded-full px-2 py-1 text-xs ${
-                  member.status === "Active"
-                    ? "bg-green-500/20 text-green-500"
-                    : "bg-red-500/20 text-red-500"
-                }`}
-              >
-                {member.status}
-              </span>
-            </td>
+  <span
+    className={`rounded-full px-2 py-1 text-xs ${
+      member.verified
+        ? "bg-green-500/20 text-green-500"
+        : "bg-red-500/20 text-red-500"
+    }`}
+  >
+    {member.verified ? "Verified" : "Not Verified"}
+  </span>
+</td>
             <td className="px-4 py-3">{member.plan}</td>
             <td className="px-4 py-3">
               <div className="flex gap-2">
@@ -259,8 +264,10 @@ const TrainersSection = ({ data, open, handleOpen }) => (
         <tr className="border-b border-red-500/20 text-left text-gray-400">
           <th className="px-4 py-3">Name</th>
           <th className="px-4 py-3">Email</th>
-          <th className="px-4 py-3">Status</th>
+          <th className="px-4 py-3">Age</th>
+          <th className="px-4 py-3">Expeiriance</th>
           <th className="px-4 py-3">Specialization</th>
+          <th className="px-4 py-3">Status</th>
           <th className="px-4 py-3">Actions</th>
         </tr>
       </thead>
@@ -421,84 +428,230 @@ const EditModal = ({ onClose }) => (
 const AdminDashboard = () => {
   const [currentSection, setCurrentSection] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  
+  // State for data
 
-  const [open, setOpen] = React.useState(false);
-
-  const handleOpen = () => setOpen(!open);
-
-  // Stats data
-  const statsData = {
-    members: {
-      total: 1284,
-      trend: 12.5,
-    },
-    trainers: {
-      total: 48,
-      trend: 8.3,
-    },
-    subscriptions: {
-      total: 856,
-      trend: -2.4,
-    },
-  };
-
-  // Sample data
-  const memberData = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      status: "Active",
-      plan: "Premium",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      status: "Inactive",
-      plan: "Basic",
-    },
-  ];
-
-  const trainerData = [
-    {
-      id: 1,
-      name: "Mike Johnson",
-      email: "mike@example.com",
-      status: "Approved",
-      specialization: "Strength Training",
-    },
-    {
-      id: 2,
-      name: "Sarah Wilson",
-      email: "sarah@example.com",
-      status: "Pending Approval",
-      specialization: "Yoga",
-    },
-  ];
-
-  const revenueData = [
-    { name: "Premium", value: 70 },
-    { name: "Basic", value: 30 },
-  ];
+  const [memberData, setMemberData] = useState([]);
+  const [trainerData, setTrainerData] = useState([]);
+  const [revenueData, setRevenueData] = useState([]);
+  const [activityData, setActivityData] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const navigationItems = [
-    { icon: BarChart, label: "Dashboard", value: "dashboard" },
-    { icon: Users, label: "Members", value: "members" },
-    { icon: Users, label: "Trainers", value: "trainers" },
-    // { icon: Package, label: 'Services', value: 'services' },
-    { icon: Video, label: "Videos", value: "videos" },
-    { icon: CreditCard, label: "Subscriptions", value: "subscriptions" },
-    { icon: MessageSquare, label: "Community", value: "community" },
-    { icon: Settings, label: "Settings", value: "settings" },
+    { value: "dashboard", label: "Dashboard", icon: BarChart },
+    { value: "members", label: "Members", icon: Users },
+    { value: "trainers", label: "Trainers", icon: Users },
+    { value: "videos", label: "Videos", icon: Video },
+    { value: "subscriptions", label: "Subscriptions", icon: CreditCard },
+    { value: "settings", label: "Settings", icon: Settings },
   ];
+  
+  const [statsData, setStatsData] = useState({
+    members: { total: 0, trend: 0 },
+    trainers: { total: 0, trend: 0 },
+    subscriptions: { total: 0, trend: 0 }
+  });
+  // Fetch dashboard data
+  // const fetchDashboardData = async () => {
+  //   try {
+  //     const [stats, revenue, activity] = await Promise.all([
+  //       apiService.getDashboardStats(),
+  //       apiService.getRevenueData(),
+  //       apiService.getRecentActivity()
+  //     ]);
+  //     setStatsData(stats);
+  //     setRevenueData(revenue);
+  //     setActivityData(activity);
+  //   } catch (err) {
+  //     setError('Failed to fetch dashboard data');
+  //     console.error(err);
+  //   }
+  // };
 
+  const fetchDashboardData = async () => {
+    try {
+      // Mock data
+      const MemberStats = { count: 100, trend: 5 }; // Example: 100 members and a trend of 5
+      const TrainerStats = { count: 20, trend: 2 }; // Example: 20 trainers and a trend of 2
+      const SubscriptionStats = { count: 150, trend: 10 }; // Example: 150 subscriptions and a trend of 10
+      
+      // Set the stats data directly with mock data
+      setStatsData({
+        members: { total: MemberStats.count, trend: MemberStats.trend },
+        trainers: { total: TrainerStats.count, trend: TrainerStats.trend },
+        subscriptions: { total: SubscriptionStats.count, trend: SubscriptionStats.trend }
+      });
+  
+      // You can also add mock data for revenue and activity if needed
+      const Revenue = [{ name: 'Product A', value: 400 },
+        { name: 'Product B', value: 300 },
+        { name: 'Product C', value: 300 },
+        { name: 'Product D', value: 200 }]; // Example: total revenue
+      const Activity = { recent: ['Activity 1', 'Activity 2'] }; // Example: recent activities
+      setRevenueData(Revenue);
+      setActivityData(Activity);
+  
+    } catch (err) {
+      setError('failed to fetch data from database');
+      console.error(err);
+    }
+  };
+  
+  
+
+  // Fetch members data
+  const fetchMembers = async () => {
+    try {
+      const data = await apiService.getMembers();
+      setMemberData(data);
+    } catch (err) {
+      setError('Failed to fetch members');
+      console.error(err);
+    }
+  };
+
+  // Fetch trainers data
+  const fetchTrainers = async () => {
+    try {
+      const data = await apiService.getTrainers();
+      setTrainerData(data);
+    } catch (err) {
+      setError('Failed to fetch trainers');
+      console.error(err);
+    }
+  };
+
+  // Fetch videos data
+  const fetchVideos = async () => {
+    try {
+      const data = await apiService.getVideos();
+      setVideos(data);
+    } catch (err) {
+      setError('Failed to fetch videos');
+      console.error(err);
+    }
+  };
+
+  // Handle member operations
+  const handleAddMember = async (memberData) => {
+    try {
+      await apiService.createMember(memberData);
+      fetchMembers();
+      setOpen(false);
+    } catch (err) {
+      setError('Failed to add member');
+      console.error(err);
+    }
+  };
+
+  const handleDeleteMember = async (id) => {
+    try {
+      await apiService.deleteMember(id);
+      fetchMembers();
+    } catch (err) {
+      setError('Failed to delete member');
+      console.error(err);
+    }
+  };
+
+  // Handle trainer operations
+  const handleAddTrainer = async (trainerData) => {
+    try {
+      await apiService.createTrainer(trainerData);
+      fetchTrainers();
+      setOpen(false);
+    } catch (err) {
+      setError('Failed to add trainer');
+      console.error(err);
+    }
+  };
+
+  const handleApproveTrainer = async (id) => {
+    try {
+      await apiService.approveTrainer(id);
+      fetchTrainers();
+    } catch (err) {
+      setError('Failed to approve trainer');
+      console.error(err);
+    }
+  };
+
+  const handleDeleteTrainer = async (id) => {
+    try {
+      await apiService.deleteTrainer(id);
+      fetchTrainers();
+    } catch (err) {
+      setError('Failed to delete trainer');
+      console.error(err);
+    }
+  };
+
+  // Handle video operations
+  const handleAddVideo = async (videoData) => {
+    try {
+      await apiService.createVideo(videoData);
+      fetchVideos();
+      setOpen(false);
+    } catch (err) {
+      setError('Failed to add video');
+      console.error(err);
+    }
+  };
+
+  const handleDeleteVideo = async (id) => {
+    try {
+      await apiService.deleteVideo(id);
+      fetchVideos();
+    } catch (err) {
+      setError('Failed to delete video');
+      console.error(err);
+    }
+  };
+
+  // Effect to fetch data based on current section
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      switch (currentSection) {
+        case 'dashboard':
+          await fetchDashboardData();
+          break;
+        case 'members':
+          await fetchMembers();
+          break;
+        case 'trainers':
+          await fetchTrainers();
+          break;
+        case 'videos':
+          await fetchVideos();
+          break;
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [currentSection]);
+
+  // Modified render section to include loading and error states
   const renderSection = () => {
+    if (loading) {
+      return <div className="flex justify-center items-center h-64">Loading...</div>;
+    }
+
+    if (error) {
+      return (
+        <div className="text-red-500 p-4 rounded-lg bg-red-500/10">
+          {error}
+        </div>
+      );
+    }
+
     switch (currentSection) {
       case "dashboard":
         return (
           <div className="space-y-6">
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               <StatsCard
                 icon={Users}
@@ -519,11 +672,9 @@ const AdminDashboard = () => {
                 trend={statsData.subscriptions.trend}
               />
             </div>
-
-            {/* Charts Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <PieChartCard title="Revenue Distribution" data={revenueData} />
-              <ActivityTable />
+              <ActivityTable data={activityData} />
             </div>
           </div>
         );
@@ -532,7 +683,9 @@ const AdminDashboard = () => {
           <MembersSection
             data={memberData}
             open={open}
-            handleOpen={handleOpen}
+            handleOpen={setOpen}
+            onAdd={handleAddMember}
+            onDelete={handleDeleteMember}
           />
         );
       case "trainers":
@@ -540,14 +693,28 @@ const AdminDashboard = () => {
           <TrainersSection
             data={trainerData}
             open={open}
-            handleOpen={handleOpen}
+            handleOpen={setOpen}
+            onAdd={handleAddTrainer}
+            onApprove={handleApproveTrainer}
+            onDelete={handleDeleteTrainer}
           />
         );
       case "videos":
-        return <VideoSection open={open} handleOpen={handleOpen} />;
+        return (
+          <VideoSection
+            videos={videos}
+            open={open}
+            handleOpen={setOpen}
+            onAdd={handleAddVideo}
+            onDelete={handleDeleteVideo}
+          />
+        );
+      default:
+        return null;
     }
   };
 
+  // ... (keep existing return statement)
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Sidebar */}
@@ -616,3 +783,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
