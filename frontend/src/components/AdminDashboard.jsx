@@ -265,7 +265,7 @@ const TrainersSection = ({ data, open, handleOpen }) => (
           <th className="px-4 py-3">Name</th>
           <th className="px-4 py-3">Email</th>
           <th className="px-4 py-3">Age</th>
-          <th className="px-4 py-3">Expeiriance</th>
+          <th className="px-4 py-3">Experience</th>
           <th className="px-4 py-3">Specialization</th>
           <th className="px-4 py-3">Status</th>
           <th className="px-4 py-3">Actions</th>
@@ -277,8 +277,11 @@ const TrainersSection = ({ data, open, handleOpen }) => (
             key={trainer.id}
             className="border-b border-red-500/10 text-white"
           >
-            <td className="px-4 py-3">{trainer.name}</td>
+            <td className="px-4 py-3">{trainer.fullName}</td>
             <td className="px-4 py-3">{trainer.email}</td>
+            <td className="px-4 py-3">{trainer.age}</td>
+            <td className="px-4 py-3">{trainer.experience}</td>
+            <td className="px-4 py-3">{trainer.specialization}</td>
             <td className="px-4 py-3">
               <span
                 className={`rounded-full px-2 py-1 text-xs ${
@@ -290,7 +293,6 @@ const TrainersSection = ({ data, open, handleOpen }) => (
                 {trainer.status}
               </span>
             </td>
-            <td className="px-4 py-3">{trainer.specialization}</td>
             <td className="px-4 py-3">
               <div className="flex gap-2">
                 {trainer.status === "Pending Approval" && (
