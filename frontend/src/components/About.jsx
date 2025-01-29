@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -12,8 +13,16 @@ import {
   Heart,
   Zap,
 } from "lucide-react";
+import Footer from "./Footer";
 
 const About = () => {
+  const navigate = useNavigate(); // Add this line
+  
+  // Add this function
+  const handleSignUp = () => {
+    navigate('/signup');
+  };
+  
   const stats = [
     {
       icon: <Users className="text-red-500 mx-auto" />,
@@ -187,7 +196,7 @@ const About = () => {
         </div>
       </div>
 
-      {/* CTA Section */}
+      {/* CTA Section - Updated with onClick handler */}
       <div className="relative py-24 mx-8 my-16 rounded-3xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-800 to-red-600 opacity-90" />
 
@@ -208,12 +217,14 @@ const About = () => {
             className="inline-flex items-center gap-3 bg-white text-red-600 px-12 py-5 text-lg font-bold rounded-full"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleSignUp} // Add this line
           >
             BEGIN YOUR CONQUEST
             <ArrowRight className="w-6 h-6" />
           </motion.button>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 };

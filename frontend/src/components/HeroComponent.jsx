@@ -23,7 +23,7 @@ const HeroComponent = () => {
 
         {/* Content */}
         <motion.div
-          className="relative z-20 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 mt-16"
+          className="relative z-20 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-6"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 1 }}
@@ -70,11 +70,14 @@ const HeroComponent = () => {
             >
               <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full" />
               <a
-                href="#"
-                className="relative bg-gradient-to-r from-red-700 to-red-500 rounded-full shadow-lg shadow-red-500/30 w-16 h-16 flex justify-center items-center"
-              >
-                <FaPlay size={30} className="text-white ml-2" />
-              </a>
+               
+  href="https://www.youtube.com/watch?v=ruX4Le0kBng&t=45s"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="relative bg-gradient-to-r from-red-700 to-red-500 rounded-full shadow-lg shadow-red-500/30 w-16 h-16 flex justify-center items-center"
+>
+  <FaPlay size={30} className="text-white ml-2" />
+</a>
             </motion.div>
           </div>
         </motion.div>

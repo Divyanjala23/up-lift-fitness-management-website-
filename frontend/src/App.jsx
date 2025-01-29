@@ -6,12 +6,14 @@ import BMICalculatorComponent from "./components/BMICalculatorComponent";
 import About from "./components/About";
 import SIgnUpComponent from "./components/SIgnUpComponent";
 import SignInComponent from "./components/SignInComponent";
-// import CommunityForum from "./components/CommunityForum";
-// import ContactUs from "./components/ContactUs";
+import CommunityForum from "./components/CommunityForum";
+import ContactUs from "./components/ContactUs";
 import Services from "./components/Services";
-// import Schedule from "./components/Shedule";
+import Schedule from "./components/Shedule";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
+import MemberDashboard from "./components/MemberDashboard";
+
 
 const App = () => {
   return (
@@ -38,7 +40,7 @@ const App = () => {
               </>
             }
           />
-          {/* <Route
+          <Route
             path="/contact"
             element={
               <>
@@ -46,7 +48,7 @@ const App = () => {
                 <ContactUs />
               </>
             }
-          /> */}
+          />
           <Route
             path="/signup"
             element={
@@ -74,7 +76,7 @@ const App = () => {
               </>
             }
           />
-          {/* <Route
+          <Route
             path="/community"
             element={
               <>
@@ -82,8 +84,8 @@ const App = () => {
                 <CommunityForum />
               </>
             }
-          /> */}
-          {/* <Route
+          />
+          <Route
             path="/schedule"
             element={
               <>
@@ -91,12 +93,20 @@ const App = () => {
                 <Schedule />
               </> 
             }
-          /> */}
+          />
           <Route
             path="/admin"
             element={
               <>
                 <AdminDashboard/>
+              </>
+            }
+          />
+          <Route
+            path="/member"
+            element={
+              <>
+                <MemberDashboard/>
               </>
             }
           />
