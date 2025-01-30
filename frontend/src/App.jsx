@@ -13,6 +13,7 @@ import Schedule from "./components/Shedule";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
 import MemberDashboard from "./components/MemberDashboard";
+import PaymentGateway from "./components/PaymentGateway";
 
 
 const App = () => {
@@ -110,6 +111,7 @@ const App = () => {
               </>
             }
           />
+          
         </Routes>
       </Router>
     </>
