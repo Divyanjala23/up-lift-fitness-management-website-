@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Crown,
   Users,
@@ -16,9 +17,13 @@ import Footer from "./Footer";
 import PaymentGateway from "./PaymentGateway";
 
 const Services = () => {
+  const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showPayment, setShowPayment] = useState(false);
 
+  const handleJoinNow = () => {
+    navigate('/signup');
+  };
   const services = [
     {
       icon: <Crown size={48} className="text-red-500" />,
@@ -325,6 +330,7 @@ const Services = () => {
             goals.
           </p>
           <motion.button 
+            onClick={handleJoinNow}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-3 bg-white text-red-600 px-12 py-5 text-lg font-bold rounded-full"
