@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+
 import { 
   User, 
   Target, 
@@ -13,30 +14,65 @@ import {
 import { motion } from 'framer-motion';
 
 const MemberDashboard = () => {
-  const [memberProfile] = useState({
-    name: "Alex Rodriguez",
-    memberSince: "January 2023",
-    membershipTier: "Premium",
-    fitnessGoals: [
-      { name: "Weight Loss", progress: 65 },
-      { name: "Muscle Gain", progress: 45 }
-    ],
-    stats: {
-      workoutsThisMonth: 16,
-      totalWorkouts: 184,
-      caloriesBurned: 24500,
-      avgWorkoutDuration: 62
-    },
-    recentAchievements: [
-      { title: "30-Day Consistency", date: "2024-01-15" },
-      { title: "Personal Best: Deadlift", date: "2024-01-22" }
-    ],
-    personalRecords: {
-      benchPress: 225,
-      squats: 315,
-      deadlift: 405
+  const [memberProfile, setMemberProfile] = useState({});
+
+  const [error, setError] = useState("");
+  const userId = localStorage.getItem("userId"); // Get userId from localStorage
+
+  useEffect(() => {
+    if (!userId) {
+      setError("User not logged in. Please log in.");
+      return;
     }
-  });
+
+    fetch(`http://localhost:8080/api/members/${userId}`, {
+      method: "GET",
+      credentials: "include", // Ensures cookies (if any) are sent
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          throw new Error("Unauthorized access. Please check your login.");
+        } else if (!res.ok) {
+          throw new Error(`Error ${res.status}: Unable to fetch data.`);
+        }
+        return res.json();
+      })
+      .then((data) => setMemberProfile(data))
+      .catch((err) => {
+        console.error("Error fetching user data:", err);
+        setError(err.message);
+      });
+  }, [userId]);
+
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!memberProfile) return <p>Loading...</p>;
+  // const [memberProfile] = useState({
+  //   name: "Alex Rodriguez",
+  //   memberSince: "January 2023",
+  //   membershipTier: "Premium",
+  //   fitnessGoals: [
+  //     { name: "Weight Loss", progress: 65 },
+  //     { name: "Muscle Gain", progress: 45 }
+  //   ],
+  //   stats: {
+  //     workoutsThisMonth: 16,
+  //     totalWorkouts: 184,
+  //     caloriesBurned: 24500,
+  //     avgWorkoutDuration: 62
+  //   },
+  //   recentAchievements: [
+  //     { title: "30-Day Consistency", date: "2024-01-15" },
+  //     { title: "Personal Best: Deadlift", date: "2024-01-22" }
+  //   ],
+  //   personalRecords: {
+  //     benchPress: 225,
+  //     squats: 315,
+  //     deadlift: 405
+  //   }
+  // });
 
   const StatCard = ({ icon, title, value, subtext }) => (
     <motion.div 
@@ -79,7 +115,7 @@ const MemberDashboard = () => {
         >
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
-              <User className="text-red-500" /> Welcome, {memberProfile.name}
+              <User className="text-red-500" /> Welcome, {memberProfile.fullName}
             </h1>
             <p className="text-gray-400">Member since {memberProfile.memberSince}</p>
           </div>
@@ -98,7 +134,7 @@ const MemberDashboard = () => {
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Target className="text-red-500" /> Fitness Goals
               </h2>
-              {memberProfile.fitnessGoals.map((goal) => (
+             // {memberProfile.fitnessGoals.map((goal) => (
                 <ProgressBar key={goal.name} goal={goal} progress={goal.progress} />
               ))}
             </motion.div>
@@ -141,7 +177,7 @@ const MemberDashboard = () => {
             />
           </div>
         </div>
-
+{/* 
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -159,7 +195,7 @@ const MemberDashboard = () => {
               <span className="text-gray-500 text-sm">{achievement.date}</span>
             </div>
           ))}
-        </motion.div>
+        </motion.div> */}
       </div>
     </div>
   );

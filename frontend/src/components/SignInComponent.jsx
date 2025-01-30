@@ -38,10 +38,14 @@ const SignInComponent = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const { role } = data; // Assuming the backend sends back the role
+        const {id, role } = data; // Assuming the backend sends back the role
+
+        // Store user ID in localStorage
+      localStorage.setItem("userId", id);
+
         // Navigate to the appropriate dashboard
         if (role === "ADMIN") navigate("/admin");
-        else if (role === "MEMBER") navigate("/member-dashboard");
+        else if (role === "MEMBER") navigate("/member");
         else if (role === "COACH") navigate("/coach-dashboard");
         else setError("Unknown role detected. Please contact support.");
       } else {
