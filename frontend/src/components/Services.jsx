@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Crown,
   Users,
@@ -13,8 +13,12 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "./Footer";
+import PaymentGateway from "./PaymentGateway";
 
 const Services = () => {
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showPayment, setShowPayment] = useState(false);
+
   const services = [
     {
       icon: <Crown size={48} className="text-red-500" />,
@@ -114,6 +118,16 @@ const Services = () => {
       ],
     },
   ];
+
+  const handlePlanSelect = (plan) => {
+    setSelectedPlan(plan);
+    setShowPayment(true);
+  };
+
+  const handleClosePayment = () => {
+    setShowPayment(false);
+    setSelectedPlan(null);
+  };
 
   return (
     <div className="bg-black text-white overflow-x-hidden font-inter">
@@ -278,6 +292,7 @@ const Services = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => handlePlanSelect(plan)}
                 className={`w-full py-4 rounded-lg font-semibold ${
                   plan.popular
                     ? "bg-red-500 text-white"
@@ -319,6 +334,15 @@ const Services = () => {
           </motion.button>
         </motion.div>
       </div>
+
+      {/* Payment Modal */}
+      {showPayment && selectedPlan && (
+        <PaymentGateway 
+          plan={selectedPlan}
+          onClose={handleClosePayment}
+        />
+      )}
+
       <Footer />
     </div>
   );
