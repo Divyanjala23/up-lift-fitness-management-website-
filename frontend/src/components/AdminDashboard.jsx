@@ -17,6 +17,7 @@ import {
   Edit,
   Check,
   Package,
+  UserPlus,
 } from "lucide-react";
 import {
   LineChart as RechartsLineChart,
@@ -41,6 +42,7 @@ import MemberRegistrationForm from "./MemberRegistrationForm";
 import CoachRegistrationForm from "./CoachRegistrationForm";
 import Thumbnail from "../assets/images/Bgs/SignInImg.jpg";
 import VideoAddForm from "./VideoAddForm";
+import AssignCoach from "./AssignCoach";
 // ... (keep existing imports)
 const StatsCard = ({ icon: Icon, label, value, trend }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
@@ -446,6 +448,7 @@ const AdminDashboard = () => {
     { value: "dashboard", label: "Dashboard", icon: BarChart },
     { value: "members", label: "Members", icon: Users },
     { value: "trainers", label: "Trainers", icon: Users },
+    { value: "assign-coach", label: "Assign Coach", icon: UserPlus },
     { value: "videos", label: "Videos", icon: Video },
     { value: "subscriptions", label: "Subscriptions", icon: CreditCard },
     { value: "settings", label: "Settings", icon: Settings },
@@ -711,6 +714,8 @@ const AdminDashboard = () => {
             onDelete={handleDeleteVideo}
           />
         );
+        case "assign-coach": // New case for AssignCoach page
+        return <AssignCoach />;
       default:
         return null;
     }
