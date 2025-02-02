@@ -250,77 +250,113 @@ const FormModal = ({ open, handleOpen, component }) => (
   </Dialog>
 );
 
-const TrainersSection = ({ data, open, handleOpen }) => (
-  <div className="rounded-xl border border-red-500/20 bg-black p-6">
-    <div className="mb-6 flex items-center justify-between">
-      <h3 className="text-xl font-bold text-white">Trainers</h3>
-      <button
-        onClick={() => handleOpen("md")}
-        className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-      >
-        <Plus className="h-4 w-4" /> Add Trainer
-      </button>
-    </div>
-    <table className="w-full">
-      <thead>
-        <tr className="border-b border-red-500/20 text-left text-gray-400">
-          <th className="px-4 py-3">Name</th>
-          <th className="px-4 py-3">Email</th>
-          <th className="px-4 py-3">Age</th>
-          <th className="px-4 py-3">Experience</th>
-          <th className="px-4 py-3">Specialization</th>
-          <th className="px-4 py-3">Status</th>
-          <th className="px-4 py-3">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((trainer) => (
-          <tr
-            key={trainer.id}
-            className="border-b border-red-500/10 text-white"
-          >
-            <td className="px-4 py-3">{trainer.fullName}</td>
-            <td className="px-4 py-3">{trainer.email}</td>
-            <td className="px-4 py-3">{trainer.age}</td>
-            <td className="px-4 py-3">{trainer.experience}</td>
-            <td className="px-4 py-3">{trainer.specialization}</td>
-            <td className="px-4 py-3">
-              <span
-                className={`rounded-full px-2 py-1 text-xs ${
-                  trainer.status === "Approved"
-                    ? "bg-green-500/20 text-green-500"
-                    : "bg-yellow-500/20 text-yellow-500"
-                }`}
-              >
-                {trainer.status}
-              </span>
-            </td>
-            <td className="px-4 py-3">
-              <div className="flex gap-2">
-                {trainer.status === "Pending Approval" && (
-                  <button className="rounded p-1 hover:bg-green-500/20">
-                    <Check className="h-4 w-4 text-green-500" />
-                  </button>
-                )}
-                <button className="rounded p-1 hover:bg-red-500/20">
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button className="rounded p-1 hover:bg-red-500/20">
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </td>
+const TrainersSection = ({ data, open, handleOpen }) => {
+  const [trainers, setTrainers] = useState(data);
+
+  // Function to update trainer's status
+  const updateTrainerStatus = (coachId, newStatus) => {
+    // Make a PUT request to the server to update the trainer's status
+    fetch(`http://localhost:8080/api/admin/coaches/${coachId}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          // Update the trainer's status locally
+          setTrainers((prevTrainers) =>
+            prevTrainers.map((trainer) =>
+              trainer.coachId === coachId ? { ...trainer, status: newStatus } : trainer
+            )
+          );
+        } else {
+          alert("Failed to update trainer status");
+        }
+      })
+      .catch((err) => alert("Error: " + err));
+  };
+
+  return (
+    <div className="rounded-xl border border-red-500/20 bg-black p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-xl font-bold text-white">Trainers</h3>
+        <button
+          onClick={() => handleOpen("md")}
+          className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+        >
+          <Plus className="h-4 w-4" /> Add Trainer
+        </button>
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-red-500/20 text-left text-gray-400">
+            <th className="px-4 py-3">Name</th>
+            <th className="px-4 py-3">Email</th>
+            <th className="px-4 py-3">Age</th>
+            <th className="px-4 py-3">Experience</th>
+            <th className="px-4 py-3">Specialization</th>
+            <th className="px-4 py-3">Status</th>
+            <th className="px-4 py-3">Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-    <FormModal
-      open={open}
-      handleOpen={handleOpen}
-      component={<CoachRegistrationForm type={"add"} />}
-    />
-  </div>
-);
+        </thead>
+        <tbody>
+          {trainers.map((trainer) => (
+            <tr key={trainer.id} className="border-b border-red-500/10 text-white">
+              <td className="px-4 py-3">{trainer.fullName}</td>
+              <td className="px-4 py-3">{trainer.email}</td>
+              <td className="px-4 py-3">{trainer.age}</td>
+              <td className="px-4 py-3">{trainer.experience}</td>
+              <td className="px-4 py-3">{trainer.specialization}</td>
+              <td className="px-4 py-3">
+                <span
+                  className={`rounded-full px-2 py-1 text-xs ${
+                    trainer.status === "APPROVED"
+                      ? "bg-green-500/20 text-green-500"
+                      : "bg-yellow-500/20 text-yellow-500"
+                  }`}
+                >
+                  {trainer.status}
+                </span>
+              </td>
+              <td className="px-4 py-3">
+                <div className="flex gap-2">
+                  {trainer.status === "PENDING_APPROVAL" && (
+                    <>
+                      <button
+                        onClick={() => updateTrainerStatus(trainer.coachId, "APPROVED")}
+                        className="rounded p-1 hover:bg-green-500/20"
+                      >
+                        <Check className="h-4 w-4 text-green-500" />
+                      </button>
+                      <button
+                        onClick={() => updateTrainerStatus(trainer.coachId, "REJECTED")}
+                        className="rounded p-1 hover:bg-red-500/20"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </button>
+                    </>
+                  )}
+                  <button className="rounded p-1 hover:bg-red-500/20">
+                    <Edit className="h-4 w-4" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <FormModal
+        open={open}
+        handleOpen={handleOpen}
+        component={<CoachRegistrationForm type={"add"} />}
+      />
+    </div>
+  );
+};
+
 
 const VideoSection = ({ open, handleOpen }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
