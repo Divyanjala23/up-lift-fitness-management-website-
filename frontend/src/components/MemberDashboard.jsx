@@ -123,7 +123,7 @@ const MemberDashboard = () => {
             {memberProfile.membershipTier} Membership
           </div>
         </motion.div>
-
+{/* 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             <motion.div 
@@ -177,7 +177,7 @@ const MemberDashboard = () => {
             />
           </div>
         </div>
-{/* 
+
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

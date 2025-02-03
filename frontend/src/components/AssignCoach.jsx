@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, UserPlus, Users, X } from "lucide-react";
+import { CheckCircle, UserPlus, Users, X, Trash2 } from "lucide-react";
 import { Dialog, DialogHeader, DialogBody } from "@material-tailwind/react";
 
 const AssignCoach = () => {
@@ -33,22 +33,31 @@ const AssignCoach = () => {
     setLoading(true);
     const response = await fetch("http://localhost:8080/api/admin/assign-coach", {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        memberId: selectedMember,
-        coachId: selectedCoach,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memberId: selectedMember, coachId: selectedCoach }),
     });
-
     setLoading(false);
     if (response.ok) {
       setShowSuccessModal(true);
-      fetch(`http://localhost:8080/api/coaches/${selectedCoach}/assigned-members`)
-        .then((res) => res.json())
-        .then((data) => setAssignedMembers(data));
+      refreshAssignedMembers();
     }
+  };
+
+  const unassignMember = async (memberId) => {
+    const response = await fetch(`http://localhost:8080/api/admin/unassign-coach`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memberId, coachId: selectedCoach }),
+    });
+    if (response.ok) {
+      refreshAssignedMembers();
+    }
+  };
+
+  const refreshAssignedMembers = () => {
+    fetch(`http://localhost:8080/api/coaches/${selectedCoach}/assigned-members`)
+      .then((res) => res.json())
+      .then((data) => setAssignedMembers(data));
   };
 
   return (
@@ -61,76 +70,41 @@ const AssignCoach = () => {
 
         <div className="grid gap-8 md:grid-cols-2">
           <div className="rounded-xl border border-red-500/20 bg-black p-6">
-            <div className="mb-6 space-y-4">
-              <label className="block">
-                <span className="mb-2 block text-sm text-gray-400">Member</span>
-                <select 
-                  onChange={(e) => setSelectedMember(e.target.value)}
-                  className="w-full rounded-lg border border-red-500/20 bg-gray-800 px-4 py-2 text-white focus:border-red-500 focus:outline-none"
-                >
-                  <option value="">Select Member</option>
-                  {members.map((member) => (
-                    <option key={member.memberId} value={member.memberId}>
-                      {member.fullName}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="block">
-                <span className="mb-2 block text-sm text-gray-400">Coach</span>
-                <select
-                  onChange={(e) => setSelectedCoach(e.target.value)}
-                  className="w-full rounded-lg border border-red-500/20 bg-gray-800 px-4 py-2 text-white focus:border-red-500 focus:outline-none"
-                >
-                  <option value="">Select Coach</option>
-                  {coaches.map((coach) => (
-                    <option key={coach.coachId} value={coach.coachId}>
-                      {coach.fullName}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            <button
-              onClick={assignCoach}
-              disabled={!selectedMember || !selectedCoach || loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2 font-semibold text-white transition-all hover:bg-red-600 disabled:opacity-50"
-            >
-              {loading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <>
-                  <UserPlus className="h-5 w-5" />
-                  Assign Coach
-                </>
-              )}
+            <label className="block mb-4">
+              <span className="text-sm text-gray-400">Member</span>
+              <select onChange={(e) => setSelectedMember(e.target.value)} className="w-full rounded-lg border bg-gray-800 px-4 py-2 text-white">
+                <option value="">Select Member</option>
+                {members.map((member) => (
+                  <option key={member.memberId} value={member.memberId}>{member.fullName}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block mb-4">
+              <span className="text-sm text-gray-400">Coach</span>
+              <select onChange={(e) => setSelectedCoach(e.target.value)} className="w-full rounded-lg border bg-gray-800 px-4 py-2 text-white">
+                <option value="">Select Coach</option>
+                {coaches.map((coach) => (
+                  <option key={coach.coachId} value={coach.coachId}>{coach.fullName}</option>
+                ))}
+              </select>
+            </label>
+            <button onClick={assignCoach} disabled={!selectedMember || !selectedCoach || loading} className="w-full bg-red-500 px-4 py-2 text-white rounded-lg">
+              {loading ? "Assigning..." : "Assign Coach"}
             </button>
           </div>
 
           <div className="rounded-xl border border-red-500/20 bg-black p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <Users className="h-5 w-5 text-red-500" />
-              <h3 className="text-lg font-semibold text-white">
-                Assigned Members for{" "}
-                <span className="text-red-500">
-                  {coaches.find((coach) => coach.coachId === selectedCoach)?.fullName || "Selected Coach"}
-                </span>
-              </h3>
-            </div>
-            
+            <h3 className="text-lg font-semibold text-white mb-4">Assigned Members</h3>
             {assignedMembers.length === 0 ? (
               <p className="text-gray-400">No members assigned yet</p>
             ) : (
               <ul className="space-y-2">
                 {assignedMembers.map((member) => (
-                  <li
-                    key={member.memberId}
-                    className="flex items-center gap-3 rounded-lg border border-red-500/10 bg-gray-800/50 px-4 py-2 text-white"
-                  >
-                    <div className="h-2 w-2 rounded-full bg-red-500" />
-                    {member.fullName}
+                  <li key={member.memberId} className="flex justify-between items-center px-4 py-2 bg-gray-800 text-white rounded-lg">
+                    <span>{member.fullName}</span>
+                    <button onClick={() => unassignMember(member.memberId)} className="text-red-500 hover:text-red-700">
+                      <Trash2 className="h-5 w-5" />
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -139,33 +113,19 @@ const AssignCoach = () => {
         </div>
       </div>
 
-      {/* Success Modal */}
       <Dialog open={showSuccessModal} handler={() => setShowSuccessModal(false)}>
-        <DialogHeader className="flex justify-between border-b border-red-500/20 p-6">
+        <DialogHeader className="flex justify-between p-6 border-b border-red-500/20">
           <span className="text-xl font-bold">Success</span>
-          <button
-            onClick={() => setShowSuccessModal(false)}
-            className="rounded-full p-1 hover:bg-red-500/10"
-          >
+          <button onClick={() => setShowSuccessModal(false)} className="p-1 rounded-full hover:bg-red-500/10">
             <X className="h-6 w-6" />
           </button>
         </DialogHeader>
-        <DialogBody className="p-6">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="rounded-full bg-green-500/20 p-3">
-              <CheckCircle className="h-12 w-12 text-green-500" />
-            </div>
-            <h3 className="text-xl font-semibold">Coach Assigned Successfully!</h3>
-            <p className="text-gray-600">
-              The member has been successfully assigned to the selected coach.
-            </p>
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="mt-4 rounded-lg bg-red-500 px-6 py-2 font-semibold text-white transition-all hover:bg-red-600"
-            >
-              Close
-            </button>
-          </div>
+        <DialogBody className="p-6 text-center">
+          <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
+          <h3 className="text-xl font-semibold mt-4">Coach Assigned Successfully!</h3>
+          <button onClick={() => setShowSuccessModal(false)} className="mt-4 bg-red-500 px-6 py-2 text-white rounded-lg">
+            Close
+          </button>
         </DialogBody>
       </Dialog>
     </div>

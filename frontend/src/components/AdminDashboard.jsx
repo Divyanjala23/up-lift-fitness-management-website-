@@ -18,6 +18,7 @@ import {
   Check,
   Package,
   UserPlus,
+  ArrowUp,
 } from "lucide-react";
 import {
   LineChart as RechartsLineChart,
@@ -226,7 +227,6 @@ const MembersSection = ({ data, open, handleOpen }) => (
         ))}
       </tbody>
     </table>
-    {/* add button model open  */}
     <FormModal
       open={open}
       handleOpen={handleOpen}
@@ -408,62 +408,203 @@ const VideoCard = () => (
   </div>
 );
 
-const DeleteConfirmationModal = ({ onClose }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-    <div className="mx-4 w-full max-w-md rounded-xl bg-gray-900 p-6">
-      <h3 className="mb-4 text-xl font-bold">Confirm Delete</h3>
-      <p className="mb-6 text-gray-400">
-        Are you sure you want to delete this item? This action cannot be undone.
-      </p>
-      <div className="flex justify-end gap-4">
+
+const CommunitySection = () => {
+  const [posts, setPosts] = useState([
+    {
+      id: 1,
+      title: "New Fitness Challenge",
+      author: "Admin",
+      content: "Join our new monthly challenge!",
+      date: "2024-03-01",
+      priority: 1,
+    },
+  ]);
+  const [newPost, setNewPost] = useState({ title: "", content: "" });
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const handleAddPost = () => {
+    if (newPost.title && newPost.content) {
+      setPosts([
+        {
+          id: posts.length + 1,
+          ...newPost,
+          author: "Admin",
+          date: new Date().toISOString().split("T")[0],
+          priority: Math.max(...posts.map(p => p.priority)) + 1,
+        },
+        ...posts,
+      ]);
+      setNewPost({ title: "", content: "" });
+      setShowAddModal(false);
+    }
+  };
+
+  const handleDeletePost = (postId) => {
+    setPosts(posts.filter(post => post.id !== postId));
+  };
+
+  const moveToTop = (postId) => {
+    const post = posts.find(p => p.id === postId);
+    const newPosts = posts.filter(p => p.id !== postId);
+    setPosts([{ ...post, priority: Math.max(...posts.map(p => p.priority)) + 1 }, ...newPosts]);
+  };
+
+  return (
+    <div className="rounded-xl border border-red-500/20 bg-black p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-xl font-bold text-white">Community Posts</h3>
         <button
-          onClick={onClose}
-          className="rounded-lg bg-gray-800 px-4 py-2 hover:bg-gray-700"
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
         >
-          Cancel
-        </button>
-        <button className="rounded-lg bg-red-500 px-4 py-2 hover:bg-red-600">
-          Delete
+          <Plus className="h-4 w-4" /> Add Post
         </button>
       </div>
-    </div>
-  </div>
-);
 
-const EditModal = ({ onClose }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-    <div className="mx-4 w-full max-w-md rounded-xl bg-gray-900 p-6">
-      <h3 className="mb-4 text-xl font-bold">Edit Item</h3>
-      <div className="mb-6 space-y-4">
-        <div>
-          <label className="mb-1 block text-sm text-gray-400">Name</label>
+      <div className="space-y-4">
+        {posts.sort((a, b) => b.priority - a.priority).map(post => (
+          <div key={post.id} className="border-b border-red-500/20 pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-semibold text-white">{post.title}</h4>
+                <p className="text-sm text-gray-400">{post.content}</p>
+                <div className="mt-1 text-xs text-gray-500">
+                  {post.date} • {post.author}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => moveToTop(post.id)}
+                  className="rounded p-1 hover:bg-red-500/20"
+                >
+                  <ArrowUp className="h-4 w-4 text-green-500" />
+                </button>
+                <button
+                  onClick={() => handleDeletePost(post.id)}
+                  className="rounded p-1 hover:bg-red-500/20"
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Dialog open={showAddModal} handler={() => setShowAddModal(!showAddModal)}>
+        <DialogHeader>Create New Post</DialogHeader>
+        <DialogBody>
           <input
             type="text"
-            className="w-full rounded-lg border border-red-500/20 bg-gray-800 px-4 py-2"
+            placeholder="Post Title"
+            className="mb-4 w-full rounded bg-gray-800 p-2 text-white"
+            value={newPost.title}
+            onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
           />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-gray-400">Status</label>
-          <select className="w-full rounded-lg border border-red-500/20 bg-gray-800 px-4 py-2">
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
-        </div>
+          <textarea
+            placeholder="Post Content"
+            className="h-32 w-full rounded bg-gray-800 p-2 text-white"
+            value={newPost.content}
+            onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+          />
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="text" onClick={() => setShowAddModal(false)}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={handleAddPost}>
+            Create Post
+          </Button>
+        </DialogFooter>
+      </Dialog>
+    </div>
+  );
+};
+
+const SubscriptionsSection = () => {
+  const [plans, setPlans] = useState([
+    {
+      id: 1,
+      name: "Basic",
+      price: 29,
+      features: ["Feature 1", "Feature 2"],
+    },
+    {
+      id: 2,
+      name: "Premium",
+      price: 59,
+      features: ["Feature 1", "Feature 2", "Feature 3"],
+    },
+  ]);
+  const [editingPlan, setEditingPlan] = useState(null);
+  const [editedPlan, setEditedPlan] = useState({});
+
+  const handleEditPlan = (plan) => {
+    setEditingPlan(plan.id);
+    setEditedPlan({ ...plan });
+  };
+
+  const savePlanChanges = () => {
+    setPlans(plans.map(p => p.id === editingPlan ? editedPlan : p));
+    setEditingPlan(null);
+  };
+
+  return (
+    <div className="rounded-xl border border-red-500/20 bg-black p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-xl font-bold text-white">Subscription Plans</h3>
       </div>
-      <div className="flex justify-end gap-4">
-        <button
-          onClick={onClose}
-          className="rounded-lg bg-gray-800 px-4 py-2 hover:bg-gray-700"
-        >
-          Cancel
-        </button>
-        <button className="rounded-lg bg-red-500 px-4 py-2 hover:bg-red-600">
-          Save Changes
-        </button>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {plans.map(plan => (
+          <div key={plan.id} className="rounded-lg border border-red-500/20 p-4">
+            {editingPlan === plan.id ? (
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={editedPlan.name}
+                  onChange={(e) => setEditedPlan({ ...editedPlan, name: e.target.value })}
+                  className="w-full rounded bg-gray-800 p-2 text-white"
+                />
+                <input
+                  type="number"
+                  value={editedPlan.price}
+                  onChange={(e) => setEditedPlan({ ...editedPlan, price: e.target.value })}
+                  className="w-full rounded bg-gray-800 p-2 text-white"
+                />
+                <button
+                  onClick={savePlanChanges}
+                  className="rounded bg-red-500 px-4 py-2 text-white"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="mb-4 flex items-center justify-between">
+                  <h4 className="text-xl font-bold text-white">{plan.name}</h4>
+                  <button
+                    onClick={() => handleEditPlan(plan)}
+                    className="text-red-500 hover:text-red-400"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="mb-4 text-2xl font-bold text-red-500">${plan.price}/mo</div>
+                <ul className="pl-4 text-gray-300 list-disc">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="mb-2">{feature}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AdminDashboard = () => {
   const [currentSection, setCurrentSection] = useState("dashboard");
@@ -486,6 +627,7 @@ const AdminDashboard = () => {
     { value: "trainers", label: "Trainers", icon: Users },
     { value: "assign-coach", label: "Assign Coach", icon: UserPlus },
     { value: "videos", label: "Videos", icon: Video },
+    { value: "community" ,label: "Community",icon: MessageSquare,  },
     { value: "subscriptions", label: "Subscriptions", icon: CreditCard },
     { value: "settings", label: "Settings", icon: Settings },
   ];
@@ -752,7 +894,13 @@ const AdminDashboard = () => {
         );
         case "assign-coach": // New case for AssignCoach page
         return <AssignCoach />;
-      default:
+
+        case "community":
+          return <CommunitySection />;
+        case "subscriptions":
+          return <SubscriptionsSection />;
+
+        default:
         return null;
     }
   };
@@ -760,7 +908,6 @@ const AdminDashboard = () => {
   // ... (keep existing return statement)
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-black ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -796,9 +943,7 @@ const AdminDashboard = () => {
         </nav>
       </aside>
 
-      {/* Main Content */}
       <div className="md:pl-64">
-        {/* Header */}
         <header className="border-b border-red-500/20 bg-black">
           <div className="flex items-center justify-between p-4">
             <button
@@ -815,7 +960,6 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="p-6">
           <PageHeader section={currentSection} />
           {renderSection()}
