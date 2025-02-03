@@ -18,7 +18,8 @@ import {
   UserPlus,
   BookOpen,
   Archive,
-  CheckCircle
+  CheckCircle,
+  Plus  
 } from 'lucide-react';
 
 // Reuse the Card components from Member Dashboard
@@ -63,6 +64,87 @@ const ClientOverviewCard = ({ client }) => (
     </div>
   </Card>
 );
+
+const ProgramsContent = () => {
+    const [programs, setPrograms] = useState([
+      {
+        id: 1,
+        name: 'Beginner Strength Training',
+        description: 'A 12-week program focused on building foundational strength.',
+        duration: '12 weeks',
+        clients: ['Alex Johnson', 'Sarah Miller'],
+        status: 'Active'
+      },
+      {
+        id: 2,
+        name: 'Advanced Cardio Conditioning',
+        description: 'High-intensity cardio program for advanced athletes.',
+        duration: '8 weeks',
+        clients: ['Michael Chen'],
+        status: 'Completed'
+      },
+      {
+        id: 3,
+        name: 'Yoga for Flexibility',
+        description: 'Improve flexibility and mobility with this 6-week yoga program.',
+        duration: '6 weeks',
+        clients: [],
+        status: 'Draft'
+      }
+    ]);
+  
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Training Programs</CardTitle>
+              <button className="text-red-500 hover:text-red-400 flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                New Program
+              </button>
+            </div>
+          </CardHeader>
+          <div className="space-y-4">
+            {programs.map(program => (
+              <div 
+                key={program.id} 
+                className={`border-b border-red-500/10 pb-4 mb-4 ${
+                  program.status === 'Completed' ? 'opacity-60' : ''
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="text-white font-semibold">{program.name}</h4>
+                    <p className="text-gray-400 text-sm mt-1">{program.description}</p>
+                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-400">
+                      <span>{program.duration}</span>
+                      <span>•</span>
+                      <span>{program.clients.length} clients</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span 
+                      className={`
+                        text-sm px-2 py-1 rounded-full 
+                        ${
+                          program.status === 'Active' ? 'bg-green-500/10 text-green-500' :
+                          program.status === 'Completed' ? 'bg-gray-500/10 text-gray-500' :
+                          'bg-red-500/10 text-red-500'
+                        }
+                      `}
+                    >
+                      {program.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    );
+  };
 
 const ClientListContent = () => {
   const [clients, setClients] = useState([
@@ -235,7 +317,7 @@ const CoachDashboard = () => {
     { label: 'Dashboard', icon: Activity, content: 'Dashboard Overview' },
     { label: 'Clients', icon: Users, content: 'Client Management' },
     { label: 'Sessions', icon: Calendar, content: 'Session Schedule' },
-    { label: 'Programs', icon: BookOpen, content: 'Training Programs' },
+    { label: 'Programs', icon: BookOpen, content: 'Training Programs' }, // Updated
     { label: 'Performance', icon: TrendingUp, content: 'Performance Tracking' }
   ];
 
@@ -354,60 +436,70 @@ const CoachDashboard = () => {
 
         {/* Dynamic Content Section */}
         <main className="p-6">
-          {activeSection === 'Dashboard' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Coach Dashboard</h2>
-                <p className="text-gray-400">Manage your clients and track performance</p>
-              </div>
+  {activeSection === 'Dashboard' && (
+    <>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-white">Coach Dashboard</h2>
+        <p className="text-gray-400">Manage your clients and track performance</p>
+      </div>
 
-              <div className="space-y-6">
-                <PerformanceTrackerContent />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <SessionScheduleContent />
-                  <ClientListContent />
-                </div>
-              </div>
-            </>
-          )}
+      <div className="space-y-6">
+        <PerformanceTrackerContent />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SessionScheduleContent />
+          <ClientListContent />
+        </div>
+      </div>
+    </>
+  )}
 
-          {activeSection === 'Clients' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Client Management</h2>
-                <p className="text-gray-400">View and manage your client roster</p>
-              </div>
-              <ClientListContent />
-            </>
-          )}
+  {activeSection === 'Clients' && (
+    <>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-white">Client Management</h2>
+        <p className="text-gray-400">View and manage your client roster</p>
+      </div>
+      <ClientListContent />
+    </>
+  )}
 
-          {activeSection === 'Sessions' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Session Schedule</h2>
-                <p className="text-gray-400">Manage your upcoming and past sessions</p>
-              </div>
-              <SessionScheduleContent />
-            </>
-          )}
+  {activeSection === 'Sessions' && (
+    <>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-white">Session Schedule</h2>
+        <p className="text-gray-400">Manage your upcoming and past sessions</p>
+      </div>
+      <SessionScheduleContent />
+    </>
+  )}
 
-          {activeSection === 'Performance' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Performance Tracker</h2>
-                <p className="text-gray-400">Analyze your coaching impact</p>
-              </div>
-              <PerformanceTrackerContent />
-            </>
-          )}
+  {activeSection === 'Programs' && (
+    <>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-white">Training Programs</h2>
+        <p className="text-gray-400">Create and manage your training programs</p>
+      </div>
+      <ProgramsContent />
+    </>
+  )}
 
-{activeSection !== 'Dashboard' && activeSection !== 'Clients' && activeSection !== 'Sessions' && activeSection !== 'Performance' && (
-  <div className="text-center py-12">
-    <h2 className="text-2xl font-bold text-white mb-4">Coming Soon</h2>
-    <p className="text-gray-400">This section is currently under development.</p>
-  </div>
-)}
-        </main>
+  {activeSection === 'Performance' && (
+    <>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-white">Performance Tracker</h2>
+        <p className="text-gray-400">Analyze your coaching impact</p>
+      </div>
+      <PerformanceTrackerContent />
+    </>
+  )}
+
+  {activeSection !== 'Dashboard' && activeSection !== 'Clients' && activeSection !== 'Sessions' && activeSection !== 'Programs' && activeSection !== 'Performance' && (
+    <div className="text-center py-12">
+      <h2 className="text-2xl font-bold text-white mb-4">Coming Soon</h2>
+      <p className="text-gray-400">This section is currently under development.</p>
+    </div>
+  )}
+</main>
       </div>
     </div>
   );
