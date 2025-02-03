@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Eye,
-  EyeOff,
-  User,
-  Lock,
-  ChevronRight,
-  Zap,
-  ArrowRight,
-} from "lucide-react";
+import { Eye, EyeOff, User, Lock, ChevronRight, Zap, ArrowRight } from "lucide-react";
 import Image_1 from "../assets/images/Bgs/SignInImg.jpg";
 
 const SignInComponent = () => {
@@ -20,6 +12,7 @@ const SignInComponent = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate(); // For navigation
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,12 +28,34 @@ const SignInComponent = () => {
     setIsLoading(true);
     setError("");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const {id, role } = data; // Assuming the backend sends back the role
+
+        // Store user ID in localStorage
+      localStorage.setItem("userId", id);
+
+        // Navigate to the appropriate dashboard
+        if (role === "ADMIN") navigate("/admin");
+        else if (role === "MEMBER") navigate("/member");
+        else if (role === "COACH") navigate("/coach-dashboard");
+        else setError("Unknown role detected. Please contact support.");
+      } else {
+        setError(data.message || "Login failed. Please try again.");
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      // Add actual API call here
-      console.log("Credentials:", loginData);
-    }, 1500);
+    }
   };
 
   return (
@@ -94,8 +109,6 @@ const SignInComponent = () => {
             <div className="w-full max-w-md">
               <motion.div
                 className="bg-gray-900/60 border border-red-500/20 rounded-xl backdrop-blur-lg p-12"
-                // whileHover={{ scale: 1.02 }}
-                // transition={{ type: "spring", stiffness: 300 }}
               >
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="text-center mb-10">
@@ -106,57 +119,37 @@ const SignInComponent = () => {
 
                   {/* Username Input */}
                   <div className="relative">
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      className="relative"
-                    >
-                      <User
-                        size={20}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                      />
-                      <input
-                        type="text"
-                        name="username"
-                        value={loginData.username}
-                        onChange={handleInputChange}
-                        className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
-                        placeholder="Username"
-                        autoComplete="username"
-                      />
-                    </motion.div>
+                    <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      name="username"
+                      value={loginData.username}
+                      onChange={handleInputChange}
+                      className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                      placeholder="Username"
+                      autoComplete="username"
+                    />
                   </div>
 
                   {/* Password Input */}
                   <div className="relative">
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      className="relative"
+                    <Lock size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={loginData.password}
+                      onChange={handleInputChange}
+                      className="w-full bg-gray-800 text-white pl-10 pr-12 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                      placeholder="Password"
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                     >
-                      <Lock
-                        size={20}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                      />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        value={loginData.password}
-                        onChange={handleInputChange}
-                        className="w-full bg-gray-800 text-white pl-10 pr-12 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
-                        placeholder="Password"
-                        autoComplete="current-password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                      >
-                        {showPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
-                      </button>
-                    </motion.div>
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
                   </div>
 
                   {/* Error Message */}
@@ -221,3 +214,5 @@ const SignInComponent = () => {
 };
 
 export default SignInComponent;
+
+
