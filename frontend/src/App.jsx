@@ -14,6 +14,7 @@ import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
 import MemberDashboard from "./components/MemberDashboard";
 import PaymentGateway from "./components/PaymentGateway";
+import CoachDashboard from "./components/CoachDashboard";
 
 
 const App = () => {
@@ -108,6 +109,14 @@ const App = () => {
             element={
               <>
                 <MemberDashboard/>
+              </>
+            }
+          />
+          <Route
+            path="/coach"
+            element={
+              <>
+                <CoachDashboard/>
               </>
             }
           />
