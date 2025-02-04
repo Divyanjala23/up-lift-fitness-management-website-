@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { format } from "date-fns"; 
 import {
   Activity,
   Calendar,
@@ -32,6 +33,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+
+
 
 // Custom Card Components
 const Card = ({ children, className = '' }) => (
@@ -167,30 +170,46 @@ const NutritionTracker = () => {
     </Card>
   );
 };
-
+const userId = localStorage.getItem("userId");
 const WorkoutsContent = () => {
-  const [workouts, setWorkouts] = useState([
-    {
-      id: 1,
-      name: 'Upper Body',
-      date: '2024-02-03',
-      exercises: [
-        { name: 'Bench Press', sets: 3, reps: 10, weight: 135 },
-        { name: 'Pull-ups', sets: 3, reps: 8 },
-        { name: 'Shoulder Press', sets: 3, reps: 12, weight: 45 },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Lower Body',
-      date: '2024-02-01',
-      exercises: [
-        { name: 'Squats', sets: 4, reps: 10, weight: 185 },
-        { name: 'Leg Press', sets: 3, reps: 12, weight: 250 },
-        { name: 'Lunges', sets: 3, reps: 15 },
-      ],
-    },
-  ]);
+  const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch workouts data from the backend
+  useEffect(() => {
+    if (!userId) return;
+
+    fetch(`http://localhost:8080/api/workouts/member/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: Unable to fetch workouts data.`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setWorkouts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching workouts data:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId]);
+
+  if (loading) {
+    return <div className="text-gray-400">Loading workouts...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -198,25 +217,31 @@ const WorkoutsContent = () => {
         <CardHeader>
           <CardTitle>Recent Workouts</CardTitle>
         </CardHeader>
-        {workouts.map((workout) => (
-          <div key={workout.id} className="border-b border-red-500/10 pb-4 mb-4">
-            <div className="flex justify-between items-center">
-              <h4 className="text-white font-semibold">{workout.name}</h4>
-              <span className="text-gray-400">{workout.date}</span>
+        {workouts.length > 0 ? (
+          workouts.map((workout) => (
+            <div key={workout._id} className="border-b border-red-500/10 pb-4 mb-4">
+              <div className="flex justify-between items-center">
+                <h4 className="text-white font-semibold">{workout.name}</h4>
+                <span className="text-gray-400">
+                  {format(new Date(workout.date), "MM/dd/yyyy HH:mm")} {/* Format the date */}
+                </span>
+              </div>
+              <div className="mt-2 space-y-2">
+                {workout.exercises.map((exercise, index) => (
+                  <div key={index} className="flex justify-between text-gray-400">
+                    <span>{exercise.name}</span>
+                    <span>
+                      {exercise.sets} sets x {exercise.reps} reps
+                      {exercise.weight ? ` @ ${exercise.weight} lbs` : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-2 space-y-2">
-              {workout.exercises.map((exercise, index) => (
-                <div key={index} className="flex justify-between text-gray-400">
-                  <span>{exercise.name}</span>
-                  <span>
-                    {exercise.sets} sets x {exercise.reps} reps
-                    {exercise.weight ? ` @ ${exercise.weight} lbs` : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-gray-400">No workouts found.</p>
+        )}
       </Card>
     </div>
   );
@@ -395,6 +420,101 @@ const MemberDashboard = () => {
     { id: 3, message: 'Upcoming session in 2 hours', unread: false },
   ]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [memberProfile, setMemberProfile] = useState({});
+
+
+  // Fetch member profile
+  useEffect(() => {
+    if (!userId) {
+      setError("User not logged in. Please log in.");
+      return;
+    }
+
+    fetch(`http://localhost:8080/api/members/${userId}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          throw new Error("Unauthorized access. Please check your login.");
+        } else if (!res.ok) {
+          throw new Error(`Error ${res.status}: Unable to fetch data.`);
+        }
+        return res.json();
+      })
+      .then((data) => setMemberProfile(data))
+      .catch((err) => {
+        console.error("Error fetching user data:", err);
+        setError(err.message);
+      });
+  }, [userId]);
+
+  // Fetch workouts
+  // useEffect(() => {
+  //   if (!userId) return;
+
+  //   fetch(`http://localhost:8080/api/workouts/member/${userId}`, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => setWorkouts(data))
+  //     .catch((err) => console.error("Error fetching workouts:", err));
+  // }, [userId]);
+
+  // // Fetch nutrition log
+  // useEffect(() => {
+  //   if (!userId) return;
+
+  //   fetch(`http://localhost:8080/api/nutrition/member/${userId}`, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => setMealLog(data))
+  //     .catch((err) => console.error("Error fetching nutrition log:", err));
+  // }, [userId]);
+
+  // // Fetch goals
+  // useEffect(() => {
+  //   if (!userId) return;
+
+  //   fetch(`http://localhost:8080/api/goals/member/${userId}`, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => setGoals(data))
+  //     .catch((err) => console.error("Error fetching goals:", err));
+  // }, [userId]);
+
+  // // Fetch progress data
+  // useEffect(() => {
+  //   if (!userId) return;
+
+  //   fetch(`http://localhost:8080/api/progress/member/${userId}`, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => setProgressData(data))
+  //     .catch((err) => console.error("Error fetching progress data:", err));
+  // }, [userId]);
+
+  // Rest of the component remains the same...
+
+
 
   const navigationItems = [
     { label: 'Dashboard', icon: Activity, content: 'Dashboard Content' },
@@ -433,7 +553,7 @@ const MemberDashboard = () => {
         } md:translate-x-0`}
       >
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold text-white">Fitness Member</h1>
+          <h1 className="text-xl font-bold text-white">{memberProfile.username}</h1>
           <button
             className="md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -580,7 +700,7 @@ const MemberDashboard = () => {
           {activeSection === 'Dashboard' && (
             <>
               <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Welcome back, Member!</h2>
+                <h2 className="text-3xl font-bold text-white">Welcome back, {memberProfile.fullName}!</h2>
                 <p className="text-gray-400">Track your fitness journey and progress</p>
               </div>
 

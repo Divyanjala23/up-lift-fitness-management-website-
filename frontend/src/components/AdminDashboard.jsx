@@ -44,6 +44,7 @@ import CoachRegistrationForm from "./CoachRegistrationForm";
 import Thumbnail from "../assets/images/Bgs/SignInImg.jpg";
 import VideoAddForm from "./VideoAddForm";
 import AssignCoach from "./AssignCoach";
+import CommunityForum from "./CommunityForum";
 // ... (keep existing imports)
 const StatsCard = ({ icon: Icon, label, value, trend }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
@@ -896,7 +897,7 @@ const AdminDashboard = () => {
         return <AssignCoach />;
 
         case "community":
-          return <CommunitySection />;
+          return <CommunityForum />;
         case "subscriptions":
           return <SubscriptionsSection />;
 
