@@ -46,7 +46,7 @@ const SignInComponent = () => {
         // Navigate to the appropriate dashboard
         if (role === "ADMIN") navigate("/admin");
         else if (role === "MEMBER") navigate("/member");
-        else if (role === "COACH") navigate("/coach-dashboard");
+        else if (role === "COACH") navigate("/coach");
         else setError("Unknown role detected. Please contact support.");
       } else {
         setError(data.message || "Login failed. Please try again.");

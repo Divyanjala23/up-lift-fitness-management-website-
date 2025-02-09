@@ -31,7 +31,7 @@ export const apiService = {
   },
 
   async createTrainer(trainerData) {
-    const response = await axios.post(`${BASE_URL}/trainers`, trainerData);
+    const response = await axios.post(`${BASE_URL}/coaches/signup`, trainerData);
     return response.data;
   },
 
@@ -41,7 +41,7 @@ export const apiService = {
   },
 
   async deleteTrainer(id) {
-    await axios.delete(`${BASE_URL}/trainers/${id}`);
+    await axios.delete(`${BASE_URL}/coaches/${id}`);
   },
 
   async approveTrainer(id) {

@@ -172,7 +172,7 @@ const PieChartCard = ({ title, data }) => (
   </div>
 );
 
-const MembersSection = ({ data, open, handleOpen }) => (
+const MembersSection = ({ data, open, handleOpen,onDelete }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
     <div className="mb-6 flex items-center justify-between">
       <h3 className="text-xl font-bold text-white">Members</h3>
@@ -219,7 +219,7 @@ const MembersSection = ({ data, open, handleOpen }) => (
                 <button className="rounded p-1 hover:bg-red-500/20">
                   <Edit className="h-4 w-4" />
                 </button>
-                <button className="rounded p-1 hover:bg-red-500/20">
+                <button className="rounded p-1 hover:bg-red-500/20" onClick={() => onDelete(member.memberId)}>
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -251,7 +251,7 @@ const FormModal = ({ open, handleOpen, component }) => (
   </Dialog>
 );
 
-const TrainersSection = ({ data, open, handleOpen }) => {
+const TrainersSection = ({ data, open, handleOpen ,onDelete}) => {
   const [trainers, setTrainers] = useState(data);
 
   // Function to update trainer's status
@@ -343,6 +343,10 @@ const TrainersSection = ({ data, open, handleOpen }) => {
                   <button className="rounded p-1 hover:bg-red-500/20">
                     <Edit className="h-4 w-4" />
                   </button>
+                  <button className="rounded p-1 hover:bg-red-500/20" onClick={() => onDelete(trainer.coachId)}>
+                  <Trash2 className="h-4 w-4" />
+                </button>
+                  
                 </div>
               </td>
             </tr>
