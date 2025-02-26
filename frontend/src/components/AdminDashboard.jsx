@@ -44,6 +44,7 @@ import CoachRegistrationForm from "./CoachRegistrationForm";
 import Thumbnail from "../assets/images/Bgs/SignInImg.jpg";
 import VideoAddForm from "./VideoAddForm";
 import AssignCoach from "./AssignCoach";
+import CommunityForum from "./CommunityForum";
 // ... (keep existing imports)
 const StatsCard = ({ icon: Icon, label, value, trend }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
@@ -171,7 +172,7 @@ const PieChartCard = ({ title, data }) => (
   </div>
 );
 
-const MembersSection = ({ data, open, handleOpen }) => (
+const MembersSection = ({ data, open, handleOpen,onDelete }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
     <div className="mb-6 flex items-center justify-between">
       <h3 className="text-xl font-bold text-white">Members</h3>
@@ -218,7 +219,7 @@ const MembersSection = ({ data, open, handleOpen }) => (
                 <button className="rounded p-1 hover:bg-red-500/20">
                   <Edit className="h-4 w-4" />
                 </button>
-                <button className="rounded p-1 hover:bg-red-500/20">
+                <button className="rounded p-1 hover:bg-red-500/20" onClick={() => onDelete(member.memberId)}>
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -250,7 +251,7 @@ const FormModal = ({ open, handleOpen, component }) => (
   </Dialog>
 );
 
-const TrainersSection = ({ data, open, handleOpen }) => {
+const TrainersSection = ({ data, open, handleOpen ,onDelete}) => {
   const [trainers, setTrainers] = useState(data);
 
   // Function to update trainer's status
@@ -342,6 +343,10 @@ const TrainersSection = ({ data, open, handleOpen }) => {
                   <button className="rounded p-1 hover:bg-red-500/20">
                     <Edit className="h-4 w-4" />
                   </button>
+                  <button className="rounded p-1 hover:bg-red-500/20" onClick={() => onDelete(trainer.coachId)}>
+                  <Trash2 className="h-4 w-4" />
+                </button>
+                  
                 </div>
               </td>
             </tr>
@@ -358,56 +363,85 @@ const TrainersSection = ({ data, open, handleOpen }) => {
 };
 
 
-const VideoSection = ({ open, handleOpen }) => (
-  <div className="rounded-xl border border-red-500/20 bg-black p-6">
-    <div className="flex items-center justify-between">
-      <h3 className="text-xl font-bold text-white">Added Videos</h3>
-      <button
-        onClick={handleOpen}
-        className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-      >
-        <Plus className="h-4 w-4" /> Add Videos
-      </button>
-    </div>
-    <div className="mt-6 grid grid-cols-4 gap-5">
-      <VideoCard />
-      <VideoCard />
-      <VideoCard />
-      <VideoCard />
-      <VideoCard />
-      <VideoCard />
-    </div>
-    <FormModal
-      open={open}
-      handleOpen={handleOpen}
-      component={<VideoAddForm />}
-    />
-  </div>
-);
+const VideoSection = ({ open, handleOpen }) => {
+  const [videos, setVideos] = useState([]);
 
-const VideoCard = () => (
-  <div className="group relative h-40 w-full cursor-pointer overflow-hidden rounded-lg bg-gray-500 transition-all duration-200 ease-in-out hover:scale-105 hover:border hover:border-red-500">
-    <img src={Thumbnail} alt="thumbnail" className="object-cover" />
-    <div className="absolute inset-0 grid w-full translate-y-80 place-content-center bg-black/50 transition-all duration-200 ease-in-out group-hover:translate-y-0">
-      <div className="mx-auto flex w-4/5 flex-col items-center justify-center">
-        <h4 className="mb-2 text-lg font-semibold text-white antialiased">
-          Video Title
-        </h4>
-        <p className="text-center text-sm tracking-tight text-gray-300">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Asperiores
-          quae harum autem omnis ab in.
-        </p>
+  // Fetch videos from the backend
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/videos"); // Replace with your API endpoint
+        const data = await response.json();
+        setVideos(data);
+      } catch (error) {
+        console.error("Failed to fetch videos:", error);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
+  return (
+    <div className="rounded-xl border border-red-500/20 bg-black p-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-bold text-white">Added Videos</h3>
+        <button
+          onClick={handleOpen}
+          className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+        >
+          <Plus className="h-4 w-4" /> Add Videos
+        </button>
       </div>
-      <button
-        onClick={() => console.log("clicked")}
-        className="group/btnDel fixed right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 p-1 hover:scale-105 hover:bg-red-500 hover:shadow-md hover:shadow-red-500"
-      >
-        <Trash2 className="h-5 w-5 transition-all duration-200 ease-in-out group-hover/btnDel:text-gray-300" />
-      </button>
+      <div className="mt-6 grid grid-cols-4 gap-5">
+        {videos.map((video) => (
+          <VideoCard key={video.id} video={video} />
+        ))}
+      </div>
+      <FormModal
+        open={open}
+        handleOpen={handleOpen}
+        component={<VideoAddForm />}
+      />
     </div>
-  </div>
-);
+  );
+};
 
+const VideoCard = ({ video }) => {
+  const handleDelete = async () => {
+    try {
+      await fetch(`http://localhost:8080/api/videos/${video.id}`, {
+        method: "DELETE",
+      });
+      console.log("Video deleted successfully");
+      // Optionally, refresh the video list after deletion
+    } catch (error) {
+      console.error("Failed to delete video:", error);
+    }
+  };
+
+  return (
+    <div className="group relative h-40 w-full cursor-pointer overflow-hidden rounded-lg bg-gray-500 transition-all duration-200 ease-in-out hover:scale-105 hover:border hover:border-red-500">
+      <video
+        src={`http://localhost:8080/${video.filePath}`}  // Ensure backend serves the video file correctly
+        className="h-full w-full object-cover"
+        controls
+      />
+      <div className="absolute inset-0 grid w-full translate-y-80 place-content-center bg-black/50 transition-all duration-200 ease-in-out group-hover:translate-y-0">
+        <div className="mx-auto flex w-4/5 flex-col items-center justify-center">
+          <h4 className="mb-2 text-lg font-semibold text-white antialiased">
+            {video.title || "Untitled Video"}
+          </h4>
+        </div>
+        <button
+          onClick={handleDelete}
+          className="group/btnDel fixed right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 p-1 hover:scale-105 hover:bg-red-500 hover:shadow-md hover:shadow-red-500"
+        >
+          <Trash2 className="h-5 w-5 transition-all duration-200 ease-in-out group-hover/btnDel:text-gray-300" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const CommunitySection = () => {
   const [posts, setPosts] = useState([
@@ -896,7 +930,7 @@ const AdminDashboard = () => {
         return <AssignCoach />;
 
         case "community":
-          return <CommunitySection />;
+          return <CommunityForum />;
         case "subscriptions":
           return <SubscriptionsSection />;
 

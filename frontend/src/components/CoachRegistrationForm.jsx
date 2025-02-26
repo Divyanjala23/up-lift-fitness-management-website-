@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Lock, Mail, Calendar, Users, Award, BookOpen, AlertCircle } from "lucide-react";
+import { User, Lock, Mail, Calendar, Users, Award, BookOpen, AlertCircle,CheckCircle } from "lucide-react";
 
 const CoachRegistrationForm = () => {
   const [coachData, setCoachData] = useState({
     fullName: "",
     email: "",
-    yearsInExperience: "",
+    experience: "",
     specialization: "",
     age: "",
     gender: "",
@@ -18,6 +18,8 @@ const CoachRegistrationForm = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,10 +27,6 @@ const CoachRegistrationForm = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
-    }
   };
 
   const validateForm = () => {
@@ -44,8 +42,8 @@ const CoachRegistrationForm = () => {
       newErrors.email = "Email is invalid";
     }
     
-    if (!coachData.yearsInExperience) {
-      newErrors.yearsInExperience = "Years of experience is required";
+    if (!coachData.experience) {
+      newErrors.experience = "Years of experience is required";
     }
     
     if (!coachData.specialization) {
@@ -88,44 +86,59 @@ const CoachRegistrationForm = () => {
     }
 
     setIsSubmitting(true);
+    setSubmitError("");
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log("Form Data Submitted:", coachData);
-      // Add your API call here
+      const response = await fetch("http://localhost:8080/api/coaches/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(coachData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to register. Please try again.");
+      }
+
+      const data = await response.json();
+      console.log("Registration Successful:", data);
+      setSubmitSuccess(true);
     } catch (error) {
-      setErrors({ submit: "Failed to submit form. Please try again." });
+      console.error(error);
+      setSubmitError(error.message || "Something went wrong.");
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
-  const InputField = ({ icon: Icon, error, ...props }) => (
-    <div className="relative">
-      <motion.div whileHover={{ scale: 1.02 }} className="relative">
-        <Icon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        <input
-          {...props}
-          className={`w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 ${
-            error ? 'ring-2 ring-red-500' : 'focus:ring-red-500'
-          } transition-all`}
-        />
-      </motion.div>
-      <AnimatePresence>
-        {error && (
-          <motion.span
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-red-500 text-sm mt-1 flex items-center gap-1"
-          >
-            <AlertCircle size={14} />
-            {error}
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+  // const InputField = ({ icon: Icon, error, ...props }) => (
+  //   <div className="relative">
+  //     <motion.div whileHover={{ scale: 1.02 }} className="relative">
+  //       <Icon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+  //       <input
+  //         {...props}
+  //         className={`w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 ${
+  //           error ? 'ring-2 ring-red-500' : 'focus:ring-red-500'
+  //         } transition-all`}
+  //       />
+  //     </motion.div>
+  //     <AnimatePresence>
+  //       {error && (
+  //         <motion.span
+  //           initial={{ opacity: 0, y: -10 }}
+  //           animate={{ opacity: 1, y: 0 }}
+  //           exit={{ opacity: 0, y: -10 }}
+  //           className="text-red-500 text-sm mt-1 flex items-center gap-1"
+  //         >
+  //           <AlertCircle size={14} />
+  //           {error}
+  //         </motion.span>
+  //       )}
+  //     </AnimatePresence>
+  //   </div>
+  // );
 
   const SelectField = ({ icon: Icon, error, label, options, ...props }) => (
     <div className="relative">
@@ -163,36 +176,53 @@ const CoachRegistrationForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <InputField
-        icon={User}
-        type="text"
-        name="fullName"
-        value={coachData.fullName}
-        onChange={handleInputChange}
-        placeholder="Full Name"
-        error={errors.fullName}
-      />
+      <div className="relative">
+              <motion.div whileHover={{ scale: 1.02 }} className="relative">
+                <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  name="fullName"
+                  value={coachData.fullName}
+                  onChange={handleInputChange}
+                  className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                  placeholder="Full Name"
+                  required
+                />
+              </motion.div>
+            </div>
+      
 
-      <InputField
-        icon={Mail}
-        type="email"
-        name="email"
-        value={coachData.email}
-        onChange={handleInputChange}
-        placeholder="Email"
-        error={errors.email}
-      />
+       <div className="relative">
+              <motion.div whileHover={{ scale: 1.02 }} className="relative">
+                <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={coachData.email}
+                  onChange={handleInputChange}
+                  className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                  placeholder="Email"
+                  required
+                />
+              </motion.div>
+            </div>
+      
 
       <div className="grid grid-cols-2 gap-4">
-        <InputField
-          icon={Award}
-          type="number"
-          name="yearsInExperience"
-          value={coachData.yearsInExperience}
-          onChange={handleInputChange}
-          placeholder="Years of Experience"
-          error={errors.yearsInExperience}
-        />
+        <div className="relative">
+              <motion.div whileHover={{ scale: 1.02 }} className="relative">
+                <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="number"
+                  name="experience"
+                  value={coachData.experience}
+                  onChange={handleInputChange}
+                  className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                  placeholder="Experiance"
+                  required
+                />
+              </motion.div>
+            </div>
         
         <SelectField
           icon={BookOpen}
@@ -211,16 +241,22 @@ const CoachRegistrationForm = () => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <InputField
-          icon={Calendar}
-          type="number"
-          name="age"
-          value={coachData.age}
-          onChange={handleInputChange}
-          placeholder="Age"
-          error={errors.age}
-        />
+      
+         <div className="grid grid-cols-2 gap-4">
+                <div className="relative">
+                  <motion.div whileHover={{ scale: 1.02 }} className="relative">
+                    <Calendar size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="number"
+                      name="age"
+                      value={coachData.age}
+                      onChange={handleInputChange}
+                      className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                      placeholder="Age"
+                      required
+                    />
+                  </motion.div>
+                </div>
         
         <SelectField
           icon={Users}
@@ -236,16 +272,20 @@ const CoachRegistrationForm = () => {
           ]}
         />
       </div>
-
-      <InputField
-        icon={User}
-        type="text"
-        name="username"
-        value={coachData.username}
-        onChange={handleInputChange}
-        placeholder="Username"
-        error={errors.username}
-      />
+<div className="relative">
+        <motion.div whileHover={{ scale: 1.02 }} className="relative">
+          <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="username"
+            value={coachData.username}
+            onChange={handleInputChange}
+            className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+            placeholder="Username"
+            required
+          />
+        </motion.div>
+      </div>
 
       <div className="relative">
         <motion.div whileHover={{ scale: 1.02 }} className="relative">
@@ -335,7 +375,7 @@ const CoachRegistrationForm = () => {
         )}
       </motion.button>
 
-      {errors.submit && (
+      {submitError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -343,7 +383,18 @@ const CoachRegistrationForm = () => {
           className="text-red-500 text-sm text-center flex items-center justify-center gap-1"
         >
           <AlertCircle size={14} />
-          {errors.submit}
+          {submitError}
+        </motion.div>
+      )}
+
+      {submitSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-green-500 text-sm text-center flex items-center justify-center gap-1"
+        >
+          <CheckCircle size={14} />
+          Registration Successful!
         </motion.div>
       )}
     </form>
