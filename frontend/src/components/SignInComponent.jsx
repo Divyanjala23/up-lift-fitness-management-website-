@@ -113,7 +113,7 @@ const SignInComponent = () => {
 
                 <h1 className="mb-6 text-4xl font-bold text-white md:text-5xl xl:text-6xl">
                   Ready to <span className="text-red-500 relative">Continue</span><br />
-                  Your <span className="text-red-500 relative">Journey</span>?
+                  Your <span className="text-red-500 relative">Journey</span> ?
                 </h1>
 
                 <p className="mb-10 text-xl text-gray-300 max-w-lg">
@@ -237,7 +237,7 @@ const SignInComponent = () => {
                   {/* Sign Up Link */}
                   <div className="mt-8 pt-6 text-center border-t border-gray-800">
                     <span className="text-gray-400">
-                      Don't have an account?{" "}
+                      Don&apos;t have an account?{" "}
                     </span>
                     <Link
                       to="/signup"

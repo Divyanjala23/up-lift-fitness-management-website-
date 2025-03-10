@@ -20,7 +20,7 @@ const Footer = () => {
               <ul className="space-y-4">
                 <li>
                   <a
-                    href="#about"
+                    href="/about"
                     className="text-gray-400 hover:text-red-500 transition-all duration-300"
                   >
                     About Us
@@ -28,7 +28,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <a
-                    href="#classes"
+                    href="/about"
                     className="text-gray-400 hover:text-red-500 transition-all duration-300"
                   >
                     Classes
@@ -36,7 +36,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <a
-                    href="#trainers"
+                    href="/about"
                     className="text-gray-400 hover:text-red-500 transition-all duration-300"
                   >
                     Trainers
@@ -44,7 +44,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <a
-                    href="#membership"
+                    href="/about"
                     className="text-gray-400 hover:text-red-500 transition-all duration-300"
                   >
                     Membership
@@ -58,16 +58,17 @@ const Footer = () => {
               </h4>
               <div className="space-y-4 text-gray-400">
                 <p className="flex items-center gap-3">
-                  <Phone className="w-4 h-4" /> +1 (555) 123-4567
+                  <Phone className="w-4 h-4" /> 011 123 4567
                 </p>
                 <p className="flex items-center gap-3">
-                  <Mail className="w-4 h-4" /> info@upliftgym.com
+                  <Mail className="w-4 h-4" /> uplift@mail.com
                 </p>
                 <p className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4" /> 123 Fitness Avenue, NY
+                  <MapPin className="w-4 h-4" /> 123 Kandy Road
+                  Kelaniya, Western Province
                 </p>
                 <p className="flex items-center gap-3">
-                  <Clock className="w-4 h-4" /> Open 5am - 11pm
+                  <Clock className="w-4 h-4" /> Open 8am - 8pm
                 </p>
               </div>
             </div>
