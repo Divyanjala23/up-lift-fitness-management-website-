@@ -16,9 +16,8 @@ import {
 import Footer from "./Footer";
 
 const About = () => {
-  const navigate = useNavigate(); // Add this line
+  const navigate = useNavigate(); 
   
-  // Add this function
   const handleSignUp = () => {
     navigate('/signup');
   };
@@ -119,6 +118,7 @@ const About = () => {
             className="bg-gradient-to-r from-red-700 to-red-500 text-white px-12 py-5 rounded-full font-semibold tracking-wider shadow-lg shadow-red-500/30 transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleSignUp}
           >
             START YOUR JOURNEY
           </motion.button>
@@ -196,7 +196,7 @@ const About = () => {
         </div>
       </div>
 
-      {/* CTA Section - Updated with onClick handler */}
+      {/* CTA Section */}
       <div className="relative py-24 mx-8 my-16 rounded-3xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-800 to-red-600 opacity-90" />
 
@@ -217,7 +217,7 @@ const About = () => {
             className="inline-flex items-center gap-3 bg-white text-red-600 px-12 py-5 text-lg font-bold rounded-full"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={handleSignUp} // Add this line
+            onClick={handleSignUp} 
           >
             BEGIN YOUR CONQUEST
             <ArrowRight className="w-6 h-6" />

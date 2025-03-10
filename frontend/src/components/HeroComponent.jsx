@@ -7,6 +7,8 @@ import { Zap, ChevronDown } from "lucide-react";
 
 import { HeroContent } from "../const";
 
+
+
 const HeroComponent = () => {
   return (
     <div className="bg-black text-white overflow-x-hidden">
