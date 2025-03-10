@@ -7,6 +7,8 @@ import { Zap, ChevronDown } from "lucide-react";
 
 import { HeroContent } from "../const";
 
+
+
 const HeroComponent = () => {
   return (
     <div className="bg-black text-white overflow-x-hidden">
@@ -23,7 +25,7 @@ const HeroComponent = () => {
 
         {/* Content */}
         <motion.div
-          className="relative z-20 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-6"
+          className="z-20 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 absolute bottom-14 left-0 right-0"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 1 }}

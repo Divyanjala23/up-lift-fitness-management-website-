@@ -42,7 +42,7 @@ const ContactUs = () => {
     {
       icon: <Mail className="w-6 h-6" />,
       title: "Email Us",
-      details: ["info@upliftgym.com", "support@upliftgym.com"],
+      details: ["uplift@mail", "support@upliftgym.com"],
     },
     {
       icon: <MapPin className="w-6 h-6" />,
