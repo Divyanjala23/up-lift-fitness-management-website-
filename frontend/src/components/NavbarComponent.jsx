@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; // Only import hooks
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { navbarContent } from '../const'
+import { navbarContent } from '../const';
 
-const NavbarComponent = () => {
+const NavbarComponent = ({ isAuthenticated }) => {
   const [openNav, setOpenNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -76,6 +76,13 @@ const NavbarComponent = () => {
     open: { x: 0, opacity: 1 },
   };
 
+  // Filter nav links based on authentication
+  const filteredNavLinks = isAuthenticated
+    ? navbarContent.navLinks
+    : navbarContent.navLinks.filter((item) =>
+        ["Home", "About", "Contact", "Services"].includes(item.text)
+      );
+
   return (
     <motion.div
       initial="hidden"
@@ -113,7 +120,7 @@ const NavbarComponent = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
-            {navbarContent.navLinks.map((item, index) => (
+            {filteredNavLinks.map((item, index) => (
               <motion.div
                 key={index}
                 custom={index}
@@ -146,41 +153,65 @@ const NavbarComponent = () => {
 
           {/* Action Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <Link to={navbarContent.button_1.linkTo}>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300 relative group"
-              >
-                <span className="relative z-10">
-                  {navbarContent.button_1.text}
-                </span>
-                <motion.div
-                  className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/20 to-transparent"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.button>
-            </Link>
-
-            <Link to={navbarContent.button_2.linkTo}>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full relative overflow-hidden group"
-              >
-                <span className="relative z-10">
-                  {navbarContent.button_2.text}
-                </span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700"
-                  initial={{ x: "100%" }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link to={navbarContent.button_1.linkTo}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300 relative group"
+                  >
+                    <span className="relative z-10">
+                      {navbarContent.button_1.text}
+                    </span>
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/20 to-transparent"
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.button>
+                </Link>
+                <Link to={navbarContent.button_2.linkTo}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full relative overflow-hidden group"
+                  >
+                    <span className="relative z-10">
+                      {navbarContent.button_2.text}
+                    </span>
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700"
+                      initial={{ x: "100%" }}
+                      whileHover={{ x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/signin">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300 relative group"
+                  >
+                    <span className="relative z-10">Sign In</span>
+                  </motion.button>
+                </Link>
+                <Link to="/signup">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full relative overflow-hidden group"
+                  >
+                    <span className="relative z-10">Sign Up</span>
+                  </motion.button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -226,7 +257,7 @@ const NavbarComponent = () => {
               className="lg:hidden bg-black/95 backdrop-blur-lg border-t border-red-500/10"
             >
               <div className="px-6 py-4 space-y-4">
-                {navbarContent.navLinks.map((item, index) => (
+                {filteredNavLinks.map((item, index) => (
                   <motion.div
                     key={index}
                     variants={menuItemVariants}
@@ -249,20 +280,41 @@ const NavbarComponent = () => {
                   variants={menuItemVariants}
                   className="pt-4 space-y-3"
                 >
-                  <Link
-                    to={navbarContent.button_1.linkTo}
-                    className="block w-full text-center px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300"
-                    onClick={() => setOpenNav(false)}
-                  >
-                    {navbarContent.button_1.text}
-                  </Link>
-                  <Link
-                    to={navbarContent.button_2.linkTo}
-                    className="block w-full text-center px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full transition-all duration-300"
-                    onClick={() => setOpenNav(false)}
-                  >
-                    {navbarContent.button_2.text}
-                  </Link>
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        to={navbarContent.button_1.linkTo}
+                        className="block w-full text-center px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300"
+                        onClick={() => setOpenNav(false)}
+                      >
+                        {navbarContent.button_1.text}
+                      </Link>
+                      <Link
+                        to={navbarContent.button_2.linkTo}
+                        className="block w-full text-center px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full transition-all duration-300"
+                        onClick={() => setOpenNav(false)}
+                      >
+                        {navbarContent.button_2.text}
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/signin"
+                        className="block w-full text-center px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300"
+                        onClick={() => setOpenNav(false)}
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        to="/signup"
+                        className="block w-full text-center px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full transition-all duration-300"
+                        onClick={() => setOpenNav(false)}
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
                 </motion.div>
               </div>
             </motion.div>

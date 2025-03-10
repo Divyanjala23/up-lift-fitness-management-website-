@@ -466,8 +466,14 @@ const CommunitySection = () => {
     },
   ]);
   const [newPost, setNewPost] = useState({ title: "", content: "" });
+  const [editPost, setEditPost] = useState({ id: null, title: "", content: "" });
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
+  // Check if the current user is an admin
+  const isAdmin = true; // Replace with actual admin check (e.g., from context or state)
+
+  // Add a new post
   const handleAddPost = () => {
     if (newPost.title && newPost.content) {
       setPosts([
@@ -476,7 +482,7 @@ const CommunitySection = () => {
           ...newPost,
           author: "Admin",
           date: new Date().toISOString().split("T")[0],
-          priority: Math.max(...posts.map(p => p.priority)) + 1,
+          priority: Math.max(...posts.map((p) => p.priority)) + 1,
         },
         ...posts,
       ]);
@@ -485,30 +491,55 @@ const CommunitySection = () => {
     }
   };
 
+  // Delete a post
   const handleDeletePost = (postId) => {
-    setPosts(posts.filter(post => post.id !== postId));
+    setPosts(posts.filter((post) => post.id !== postId));
   };
 
+  // Move a post to the top
   const moveToTop = (postId) => {
-    const post = posts.find(p => p.id === postId);
-    const newPosts = posts.filter(p => p.id !== postId);
-    setPosts([{ ...post, priority: Math.max(...posts.map(p => p.priority)) + 1 }, ...newPosts]);
+    const post = posts.find((p) => p.id === postId);
+    const newPosts = posts.filter((p) => p.id !== postId);
+    setPosts([{ ...post, priority: Math.max(...posts.map((p) => p.priority)) + 1 }, ...newPosts]);
+  };
+
+  // Open the edit modal with the selected post's data
+  const handleEditPost = (post) => {
+    setEditPost({ id: post.id, title: post.title, content: post.content });
+    setShowEditModal(true);
+  };
+
+  // Update the post
+  const handleUpdatePost = () => {
+    if (editPost.title && editPost.content) {
+      setPosts(
+        posts.map((post) =>
+          post.id === editPost.id
+            ? { ...post, title: editPost.title, content: editPost.content }
+            : post
+        )
+      );
+      setEditPost({ id: null, title: "", content: "" });
+      setShowEditModal(false);
+    }
   };
 
   return (
     <div className="rounded-xl border border-red-500/20 bg-black p-6">
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-xl font-bold text-white">Community Posts</h3>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-        >
-          <Plus className="h-4 w-4" /> Add Post
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+          >
+            <Plus className="h-4 w-4" /> Add Post
+          </button>
+        )}
       </div>
 
       <div className="space-y-4">
-        {posts.sort((a, b) => b.priority - a.priority).map(post => (
+        {posts.sort((a, b) => b.priority - a.priority).map((post) => (
           <div key={post.id} className="border-b border-red-500/20 pb-4">
             <div className="flex items-center justify-between">
               <div>
@@ -518,25 +549,34 @@ const CommunitySection = () => {
                   {post.date} • {post.author}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => moveToTop(post.id)}
-                  className="rounded p-1 hover:bg-red-500/20"
-                >
-                  <ArrowUp className="h-4 w-4 text-green-500" />
-                </button>
-                <button
-                  onClick={() => handleDeletePost(post.id)}
-                  className="rounded p-1 hover:bg-red-500/20"
-                >
-                  <Trash2 className="h-4 w-4 text-red-500" />
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => moveToTop(post.id)}
+                    className="rounded p-1 hover:bg-red-500/20"
+                  >
+                    <ArrowUp className="h-4 w-4 text-green-500" />
+                  </button>
+                  <button
+                    onClick={() => handleEditPost(post)}
+                    className="rounded p-1 hover:bg-red-500/20"
+                  >
+                    <Edit className="h-4 w-4 text-blue-500" />
+                  </button>
+                  <button
+                    onClick={() => handleDeletePost(post.id)}
+                    className="rounded p-1 hover:bg-red-500/20"
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
+      {/* Add Post Modal */}
       <Dialog open={showAddModal} handler={() => setShowAddModal(!showAddModal)}>
         <DialogHeader>Create New Post</DialogHeader>
         <DialogBody>
@@ -563,36 +603,71 @@ const CommunitySection = () => {
           </Button>
         </DialogFooter>
       </Dialog>
+
+      {/* Edit Post Modal */}
+      <Dialog open={showEditModal} handler={() => setShowEditModal(!showEditModal)}>
+        <DialogHeader>Edit Post</DialogHeader>
+        <DialogBody>
+          <input
+            type="text"
+            placeholder="Post Title"
+            className="mb-4 w-full rounded bg-gray-800 p-2 text-white"
+            value={editPost.title}
+            onChange={(e) => setEditPost({ ...editPost, title: e.target.value })}
+          />
+          <textarea
+            placeholder="Post Content"
+            className="h-32 w-full rounded bg-gray-800 p-2 text-white"
+            value={editPost.content}
+            onChange={(e) => setEditPost({ ...editPost, content: e.target.value })}
+          />
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="text" onClick={() => setShowEditModal(false)}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={handleUpdatePost}>
+            Update Post
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };
 
 const SubscriptionsSection = () => {
-  const [plans, setPlans] = useState([
-    {
-      id: 1,
-      name: "Basic",
-      price: 29,
-      features: ["Feature 1", "Feature 2"],
-    },
-    {
-      id: 2,
-      name: "Premium",
-      price: 59,
-      features: ["Feature 1", "Feature 2", "Feature 3"],
-    },
-  ]);
+  const [plans, setPlans] = useState([]);
   const [editingPlan, setEditingPlan] = useState(null);
   const [editedPlan, setEditedPlan] = useState({});
+
+  // Fetch subscription plans from backend on mount
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await fetchData('/api/plans'); // Make sure to replace this with your actual endpoint
+        setPlans(response);
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+      }
+    };
+    fetchPlans();
+  }, []);
 
   const handleEditPlan = (plan) => {
     setEditingPlan(plan.id);
     setEditedPlan({ ...plan });
   };
 
-  const savePlanChanges = () => {
-    setPlans(plans.map(p => p.id === editingPlan ? editedPlan : p));
-    setEditingPlan(null);
+  const savePlanChanges = async () => {
+    try {
+      const response = await updatePlan(editedPlan); // Replace with actual API call to update the plan
+      setPlans((prevPlans) =>
+        prevPlans.map((p) => (p.id === editingPlan ? response : p))
+      );
+      setEditingPlan(null);
+    } catch (error) {
+      console.error("Error updating plan:", error);
+    }
   };
 
   return (
@@ -602,20 +677,24 @@ const SubscriptionsSection = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {plans.map(plan => (
+        {plans.map((plan) => (
           <div key={plan.id} className="rounded-lg border border-red-500/20 p-4">
             {editingPlan === plan.id ? (
               <div className="space-y-4">
                 <input
                   type="text"
                   value={editedPlan.name}
-                  onChange={(e) => setEditedPlan({ ...editedPlan, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditedPlan({ ...editedPlan, name: e.target.value })
+                  }
                   className="w-full rounded bg-gray-800 p-2 text-white"
                 />
                 <input
                   type="number"
                   value={editedPlan.price}
-                  onChange={(e) => setEditedPlan({ ...editedPlan, price: e.target.value })}
+                  onChange={(e) =>
+                    setEditedPlan({ ...editedPlan, price: e.target.value })
+                  }
                   className="w-full rounded bg-gray-800 p-2 text-white"
                 />
                 <button
@@ -636,7 +715,9 @@ const SubscriptionsSection = () => {
                     <Edit className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="mb-4 text-2xl font-bold text-red-500">${plan.price}/mo</div>
+                <div className="mb-4 text-2xl font-bold text-red-500">
+                  ${plan.price}/mo
+                </div>
                 <ul className="pl-4 text-gray-300 list-disc">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="mb-2">{feature}</li>
