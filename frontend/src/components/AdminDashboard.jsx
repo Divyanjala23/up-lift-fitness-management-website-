@@ -802,14 +802,16 @@ const AdminDashboard = () => {
     try {
       // Mock data
       const memberCountResponse = await fetch('http://localhost:8080/api/members/count');// Example: 100 members and a trend of 5
-      const TrainerStats = { count: 20, trend: 2 }; // Example: 20 trainers and a trend of 2
-      const SubscriptionStats = { count: 150, trend: 10 }; // Example: 150 subscriptions and a trend of 10
+      const trainerCountResponse = await fetch('http://localhost:8080/api/coaches/count'); // Example: 20 trainers and a trend of 2
+      const subscriptionResponse = await fetch('http://localhost:8080/api/plans/count'); // Example: 150 subscriptions and a trend of 10
       const memberCount = await memberCountResponse.json();
+      const trainerCount = await trainerCountResponse.json();
+      const subscriptionCount = await subscriptionResponse.json();
       // Set the stats data directly with mock data
       setStatsData({
         members: { total: memberCount,  },
-        trainers: { total: TrainerStats.count, trend: TrainerStats.trend },
-        subscriptions: { total: SubscriptionStats.count, trend: SubscriptionStats.trend }
+        trainers: { total: trainerCount, },
+        subscriptions: { total: subscriptionCount,  }
       });
   
       // You can also add mock data for revenue and activity if needed

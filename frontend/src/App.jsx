@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
 
 import Navbar from "./components/NavbarComponent";
@@ -20,16 +20,30 @@ import PaymentGateway from "./components/PaymentGateway";
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Check if the user is authenticated on app load
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const handleLogin = () => {
     setIsAuthenticated(true);
+    localStorage.setItem("authToken", "dummy-token"); // Store a token in localStorage
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem("authToken"); // Remove the token on logout
   };
 
   const ProtectedRoute = ({ element }) => {
     return isAuthenticated ? element : <Navigate to="/signin" />;
+  };
+
+  const PublicRoute = ({ element }) => {
+    return isAuthenticated ? <Navigate to="/" /> : element;
   };
 
   // Wrapper component to conditionally render Navbar
@@ -42,7 +56,7 @@ const App = () => {
 
     return (
       <>
-        {includeNavbar && !isDashboardRoute && <Navbar isAuthenticated={isAuthenticated} />}
+        {includeNavbar && !isDashboardRoute && <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
         {children}
         {includeNavbar && !isDashboardRoute && <Footer />}
       </>
@@ -92,7 +106,7 @@ const App = () => {
           path="/signin"
           element={
             <Layout includeNavbar={true}>
-              <SignInComponent onLogin={handleLogin} />
+              <PublicRoute element={<SignInComponent onLogin={handleLogin} />} />
             </Layout>
           }
         />
@@ -100,7 +114,7 @@ const App = () => {
           path="/signup"
           element={
             <Layout includeNavbar={true}>
-              <SignUpComponent onLogin={handleLogin} />
+              <PublicRoute element={<SignUpComponent onLogin={handleLogin} />} />
             </Layout>
           }
         />

@@ -23,6 +23,70 @@ const Services = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Define the services array
+  const services = [
+    {
+      icon: <Crown size={32} className="text-red-500" />,
+      title: "Personal Training",
+      description: "Tailored workout plans designed by certified trainers.",
+      features: [
+        "One-on-one coaching",
+        "Customized workout plans",
+        "Nutrition guidance",
+      ],
+    },
+    {
+      icon: <Users size={32} className="text-red-500" />,
+      title: "Group Classes",
+      description: "Join our high-energy group fitness sessions.",
+      features: [
+        "Yoga & Pilates",
+        "HIIT & Cardio",
+        "Strength training",
+      ],
+    },
+    {
+      icon: <LineChart size={32} className="text-red-500" />,
+      title: "Progress Tracking",
+      description: "Track your fitness journey with advanced analytics.",
+      features: [
+        "Body composition analysis",
+        "Performance metrics",
+        "Weekly progress reports",
+      ],
+    },
+    {
+      icon: <Calculator size={32} className="text-red-500" />,
+      title: "Nutrition Planning",
+      description: "Personalized meal plans to fuel your goals.",
+      features: [
+        "Custom meal plans",
+        "Macro tracking",
+        "Dietitian consultations",
+      ],
+    },
+    {
+      icon: <MessageSquare size={32} className="text-red-500" />,
+      title: "Community Support",
+      description: "Connect with like-minded fitness enthusiasts.",
+      features: [
+        "Online forums",
+        "Live Q&A sessions",
+        "Exclusive events",
+      ],
+    },
+    {
+      icon: <Video size={32} className="text-red-500" />,
+      title: "On-Demand Workouts",
+      description: "Access our library of workout videos anytime.",
+      features: [
+        "Beginner to advanced levels",
+        "Yoga, cardio, and strength",
+        "New videos weekly",
+      ],
+    },
+  ];
+
   // Fetch subscription plans from the backend when the component mounts
   useEffect(() => {
     const fetchPlans = async () => {
@@ -59,7 +123,7 @@ const Services = () => {
 
   const savePlanChanges = async (editedPlan) => {
     try {
-      const response = await fetch(`/api/plans/${editedPlan.id}`, {
+      const response = await fetch('/api/plans/${editedPlan.id}', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
