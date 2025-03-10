@@ -33,7 +33,7 @@ const App = () => {
   };
 
   // Wrapper component to conditionally render Navbar
-  const Layout = ({ children }) => {
+  const Layout = ({ children, includeNavbar = true }) => {
     const location = useLocation();
     const isDashboardRoute =
       location.pathname.startsWith("/admin") ||
@@ -42,9 +42,9 @@ const App = () => {
 
     return (
       <>
-        {!isDashboardRoute && <Navbar isAuthenticated={isAuthenticated} />}
+        {includeNavbar && !isDashboardRoute && <Navbar isAuthenticated={isAuthenticated} />}
         {children}
-        {!isDashboardRoute && <Footer />}
+        {includeNavbar && !isDashboardRoute && <Footer />}
       </>
     );
   };
@@ -86,13 +86,23 @@ const App = () => {
             </Layout>
           }
         />
+
+        {/* SignIn and SignUp routes where Navbar should always be visible */}
         <Route
           path="/signin"
-          element={<SignInComponent onLogin={handleLogin} />}
+          element={
+            <Layout includeNavbar={true}>
+              <SignInComponent onLogin={handleLogin} />
+            </Layout>
+          }
         />
         <Route
           path="/signup"
-          element={<SignUpComponent onLogin={handleLogin} />}
+          element={
+            <Layout includeNavbar={true}>
+              <SignUpComponent onLogin={handleLogin} />
+            </Layout>
+          }
         />
 
         {/* Protected Routes */}

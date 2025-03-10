@@ -644,14 +644,32 @@ const SubscriptionsSection = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await fetchData('/api/plans'); // Make sure to replace this with your actual endpoint
-        setPlans(response);
+        const response = await fetch('http://localhost:8080/api/plans'); // Replace with your actual endpoint
+        const data = await response.json();
+        setPlans(data);
       } catch (error) {
         console.error("Error fetching plans:", error);
       }
     };
     fetchPlans();
   }, []);
+
+  // Function to update the plan
+  const updatePlan = async (plan) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/plans/${plan.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(plan),
+      });
+      const updatedPlan = await response.json();
+      return updatedPlan;
+    } catch (error) {
+      console.error("Error updating plan:", error);
+    }
+  };
 
   const handleEditPlan = (plan) => {
     setEditingPlan(plan.id);
@@ -660,7 +678,7 @@ const SubscriptionsSection = () => {
 
   const savePlanChanges = async () => {
     try {
-      const response = await updatePlan(editedPlan); // Replace with actual API call to update the plan
+      const response = await updatePlan(editedPlan); // Call updatePlan function
       setPlans((prevPlans) =>
         prevPlans.map((p) => (p.id === editingPlan ? response : p))
       );
@@ -783,13 +801,13 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       // Mock data
-      const MemberStats = { count: 100, trend: 5 }; // Example: 100 members and a trend of 5
+      const memberCountResponse = await fetch('http://localhost:8080/api/members/count');// Example: 100 members and a trend of 5
       const TrainerStats = { count: 20, trend: 2 }; // Example: 20 trainers and a trend of 2
       const SubscriptionStats = { count: 150, trend: 10 }; // Example: 150 subscriptions and a trend of 10
-      
+      const memberCount = await memberCountResponse.json();
       // Set the stats data directly with mock data
       setStatsData({
-        members: { total: MemberStats.count, trend: MemberStats.trend },
+        members: { total: memberCount,  },
         trainers: { total: TrainerStats.count, trend: TrainerStats.trend },
         subscriptions: { total: SubscriptionStats.count, trend: SubscriptionStats.trend }
       });

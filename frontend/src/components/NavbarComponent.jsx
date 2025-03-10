@@ -78,10 +78,10 @@ const NavbarComponent = ({ isAuthenticated }) => {
 
   // Filter nav links based on authentication
   const filteredNavLinks = isAuthenticated
-    ? navbarContent.navLinks
+    ? navbarContent.navLinks // Show all links for authenticated users
     : navbarContent.navLinks.filter((item) =>
         ["Home", "About", "Contact", "Services"].includes(item.text)
-      );
+      ); // Show only public links for unauthorized users
 
   return (
     <motion.div
@@ -164,12 +164,6 @@ const NavbarComponent = ({ isAuthenticated }) => {
                     <span className="relative z-10">
                       {navbarContent.button_1.text}
                     </span>
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/20 to-transparent"
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
                   </motion.button>
                 </Link>
                 <Link to={navbarContent.button_2.linkTo}>
@@ -181,12 +175,6 @@ const NavbarComponent = ({ isAuthenticated }) => {
                     <span className="relative z-10">
                       {navbarContent.button_2.text}
                     </span>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700"
-                      initial={{ x: "100%" }}
-                      whileHover={{ x: 0 }}
-                      transition={{ duration: 0.3 }}
-                    />
                   </motion.button>
                 </Link>
               </>
