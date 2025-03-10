@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from "date-fns"; 
 import {
   Activity,
@@ -33,8 +33,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-
-
 
 // Custom Card Components
 const Card = ({ children, className = '' }) => (
@@ -170,7 +168,10 @@ const NutritionTracker = () => {
     </Card>
   );
 };
+
 const userId = localStorage.getItem("userId");
+const token = localStorage.getItem("token"); // Retrieve the JWT token
+
 const WorkoutsContent = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -178,12 +179,13 @@ const WorkoutsContent = () => {
 
   // Fetch workouts data from the backend
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !token) return;
 
     fetch(`http://localhost:8080/api/workouts/member/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // Include the JWT token in the headers
       },
     })
       .then((res) => {
@@ -201,7 +203,7 @@ const WorkoutsContent = () => {
         setError(err.message);
         setLoading(false);
       });
-  }, [userId]);
+  }, [userId, token]);
 
   if (loading) {
     return <div className="text-gray-400">Loading workouts...</div>;
@@ -421,11 +423,11 @@ const MemberDashboard = () => {
   ]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [memberProfile, setMemberProfile] = useState({});
-
+  const [error, setError] = useState(null);
 
   // Fetch member profile
   useEffect(() => {
-    if (!userId) {
+    if (!userId || !token) {
       setError("User not logged in. Please log in.");
       return;
     }
@@ -435,6 +437,7 @@ const MemberDashboard = () => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // Include the JWT token in the headers
       },
     })
       .then((res) => {
@@ -445,76 +448,16 @@ const MemberDashboard = () => {
         }
         return res.json();
       })
-      .then((data) => setMemberProfile(data))
+      
+      .then((data) => {
+        console.log("API Response:", data); // Log the API response
+        setMemberProfile(data); // Set the member profile state
+      })
       .catch((err) => {
         console.error("Error fetching user data:", err);
         setError(err.message);
       });
-  }, [userId]);
-
-  // Fetch workouts
-  // useEffect(() => {
-  //   if (!userId) return;
-
-  //   fetch(`http://localhost:8080/api/workouts/member/${userId}`, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => setWorkouts(data))
-  //     .catch((err) => console.error("Error fetching workouts:", err));
-  // }, [userId]);
-
-  // // Fetch nutrition log
-  // useEffect(() => {
-  //   if (!userId) return;
-
-  //   fetch(`http://localhost:8080/api/nutrition/member/${userId}`, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => setMealLog(data))
-  //     .catch((err) => console.error("Error fetching nutrition log:", err));
-  // }, [userId]);
-
-  // // Fetch goals
-  // useEffect(() => {
-  //   if (!userId) return;
-
-  //   fetch(`http://localhost:8080/api/goals/member/${userId}`, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => setGoals(data))
-  //     .catch((err) => console.error("Error fetching goals:", err));
-  // }, [userId]);
-
-  // // Fetch progress data
-  // useEffect(() => {
-  //   if (!userId) return;
-
-  //   fetch(`http://localhost:8080/api/progress/member/${userId}`, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => setProgressData(data))
-  //     .catch((err) => console.error("Error fetching progress data:", err));
-  // }, [userId]);
-
-  // Rest of the component remains the same...
-
-
+  }, [userId, token]);
 
   const navigationItems = [
     { label: 'Dashboard', icon: Activity, content: 'Dashboard Content' },

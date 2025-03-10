@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, User, Lock, ChevronRight, Zap, ArrowRight } from "lucide-react";
 import Image_1 from "../assets/images/Bgs/SignInImg.jpg";
+import { jwtDecode } from "jwt-decode";
 
 const SignInComponent = () => {
   const [loginData, setLoginData] = useState({
@@ -38,15 +39,21 @@ const SignInComponent = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const {id, role } = data; // Assuming the backend sends back the role
+        const { token } = data; // Get JWT token from response
 
-        // Store user ID in localStorage
-      localStorage.setItem("userId", id);
+        // Store JWT token in localStorage
+        localStorage.setItem("token", token);
+
+        // Decode JWT to get user details
+        const decodedToken = jwtDecode(token);
+        localStorage.setItem("userId", decodedToken.id);
+        localStorage.setItem("username", decodedToken.username);
+        localStorage.setItem("role", decodedToken.role);
 
         // Navigate to the appropriate dashboard
-        if (role === "ADMIN") navigate("/admin");
-        else if (role === "MEMBER") navigate("/member");
-        else if (role === "COACH") navigate("/coach");
+        if (decodedToken.role === "ADMIN") navigate("api/admin");
+        else if (decodedToken.role === "MEMBER") navigate("/api/members");
+        else if (decodedToken.role === "COACH") navigate("/api/coaches");
         else setError("Unknown role detected. Please contact support.");
       } else {
         setError(data.message || "Login failed. Please try again.");
@@ -107,9 +114,7 @@ const SignInComponent = () => {
             className="flex items-center justify-center px-4 lg:px-10"
           >
             <div className="w-full max-w-md">
-              <motion.div
-                className="bg-gray-900/60 border border-red-500/20 rounded-xl backdrop-blur-lg p-12"
-              >
+              <motion.div className="bg-gray-900/60 border border-red-500/20 rounded-xl backdrop-blur-lg p-12">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="text-center mb-10">
                     <h3 className="text-4xl font-bold bg-gradient-to-r from-white to-red-500 bg-clip-text text-transparent">
@@ -174,35 +179,9 @@ const SignInComponent = () => {
                     className="w-full bg-gradient-to-r from-red-700 to-red-500 text-white py-3 rounded-lg font-semibold shadow-lg shadow-red-500/30 flex items-center justify-center gap-2"
                     disabled={isLoading}
                   >
-                    {isLoading ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                        className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"
-                      />
-                    ) : (
-                      <>
-                        Sign In
-                        <ArrowRight size={20} />
-                      </>
-                    )}
+                    {isLoading ? "Loading..." : "Sign In"}
+                    <ArrowRight size={20} />
                   </motion.button>
-
-                  {/* Sign Up Link */}
-                  <motion.div
-                    className="text-center"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <span className="text-gray-400">
-                      Don't have an account?{" "}
-                    </span>
-                    <Link
-                      to="/signup"
-                      className="text-red-500 font-semibold hover:text-red-400 transition-colors inline-flex items-center gap-1"
-                    >
-                      Sign up <ChevronRight size={16} />
-                    </Link>
-                  </motion.div>
                 </form>
               </motion.div>
             </div>
@@ -214,5 +193,3 @@ const SignInComponent = () => {
 };
 
 export default SignInComponent;
-
-
