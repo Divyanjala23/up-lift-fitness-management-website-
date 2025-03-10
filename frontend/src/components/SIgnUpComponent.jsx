@@ -77,7 +77,7 @@ const SignUpComponent = () => {
                       className={`group flex items-start space-x-4 rounded-xl border border-red-500/20 bg-black/40 p-5 backdrop-blur-sm transition-all duration-300 hover:border-red-500/40 hover:bg-black/60 hover:shadow-md hover:shadow-red-500/5 ${
                         animateIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                       }`}
-                      style={{ transitionDelay: ${index * 150}ms }}
+                      style={{ transitionDelay: `${index * 150}ms` }}
                     >
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10 text-red-500 transition-all duration-300 group-hover:bg-red-500/20">
                         <feature.icon size={24} />
@@ -154,7 +154,6 @@ const SignUpComponent = () => {
           </div>
         </div>
       </div>
-
       {/* Footer */}
       <footer className="relative z-10 border-t border-red-500/10 py-6 mt-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
