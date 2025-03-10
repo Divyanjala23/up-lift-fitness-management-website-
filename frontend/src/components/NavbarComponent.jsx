@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import {  Menu, X } from "lucide-react";
-import { navbarContent } from '../const';
+import { ChevronDown, Menu, X } from "lucide-react";
+import { navbarContent } from '../const'
 
-const NavbarComponent = ({ isAuthenticated, onLogout }) => {
+const NavbarComponent = () => {
   const [openNav, setOpenNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -114,151 +113,48 @@ const NavbarComponent = ({ isAuthenticated, onLogout }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
-            {/* Always show these links */}
-            <motion.div custom={0} variants={linkVariants} initial="hidden" animate="visible">
-              <Link
-                to="/"
-                className={`relative group py-2 text-lg font-medium transition-colors duration-300 ${
-                  location.pathname === "/"
-                    ? "text-red-500"
-                    : "text-white hover:text-red-400"
-                }`}
+            {navbarContent.navLinks.map((item, index) => (
+              <motion.div
+                key={index}
+                custom={index}
+                variants={linkVariants}
+                initial="hidden"
+                animate="visible"
               >
-                <span className="relative z-10">Home</span>
-                <motion.span
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 rounded-full"
-                  initial={{ scaleX: 0 }}
-                  animate={{
-                    scaleX: location.pathname === "/" ? 1 : 0,
-                  }}
-                  whileHover={{ scaleX: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </Link>
-            </motion.div>
-            <motion.div custom={1} variants={linkVariants} initial="hidden" animate="visible">
-              <Link
-                to="/about"
-                className={`relative group py-2 text-lg font-medium transition-colors duration-300 ${
-                  location.pathname === "/about"
-                    ? "text-red-500"
-                    : "text-white hover:text-red-400"
-                }`}
-              >
-                <span className="relative z-10">About</span>
-                <motion.span
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 rounded-full"
-                  initial={{ scaleX: 0 }}
-                  animate={{
-                    scaleX: location.pathname === "/about" ? 1 : 0,
-                  }}
-                  whileHover={{ scaleX: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </Link>
-            </motion.div>
-            <motion.div custom={2} variants={linkVariants} initial="hidden" animate="visible">
-              <Link
-                to="/contact"
-                className={`relative group py-2 text-lg font-medium transition-colors duration-300 ${
-                  location.pathname === "/contact"
-                    ? "text-red-500"
-                    : "text-white hover:text-red-400"
-                }`}
-              >
-                <span className="relative z-10">Contact</span>
-                <motion.span
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 rounded-full"
-                  initial={{ scaleX: 0 }}
-                  animate={{
-                    scaleX: location.pathname === "/contact" ? 1 : 0,
-                  }}
-                  whileHover={{ scaleX: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </Link>
-            </motion.div>
-            <motion.div custom={3} variants={linkVariants} initial="hidden" animate="visible">
-              <Link
-                to="/services"
-                className={`relative group py-2 text-lg font-medium transition-colors duration-300 ${
-                  location.pathname === "/services"
-                    ? "text-red-500"
-                    : "text-white hover:text-red-400"
-                }`}
-              >
-                <span className="relative z-10">Services</span>
-                <motion.span
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 rounded-full"
-                  initial={{ scaleX: 0 }}
-                  animate={{
-                    scaleX: location.pathname === "/services" ? 1 : 0,
-                  }}
-                  whileHover={{ scaleX: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </Link>
-            </motion.div>
-
-            {/* Conditionally render Schedule and Community links for authenticated users */}
-            {isAuthenticated && (
-              <>
-                <motion.div custom={4} variants={linkVariants} initial="hidden" animate="visible">
-                  <Link
-                    to="/community"
-                    className={`relative group py-2 text-lg font-medium transition-colors duration-300 ${
-                      location.pathname === "/community"
-                        ? "text-red-500"
-                        : "text-white hover:text-red-400"
-                    }`}
-                  >
-                    <span className="relative z-10">Community</span>
-                    <motion.span
-                      className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 rounded-full"
-                      initial={{ scaleX: 0 }}
-                      animate={{
-                        scaleX: location.pathname === "/community" ? 1 : 0,
-                      }}
-                      whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </Link>
-                </motion.div>
-                <motion.div custom={5} variants={linkVariants} initial="hidden" animate="visible">
-                  <Link
-                    to="/schedule"
-                    className={`relative group py-2 text-lg font-medium transition-colors duration-300 ${
-                      location.pathname === "/schedule"
-                        ? "text-red-500"
-                        : "text-white hover:text-red-400"
-                    }`}
-                  >
-                    <span className="relative z-10">Schedule</span>
-                    <motion.span
-                      className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 rounded-full"
-                      initial={{ scaleX: 0 }}
-                      animate={{
-                        scaleX: location.pathname === "/schedule" ? 1 : 0,
-                      }}
-                      whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </Link>
-                </motion.div>
-              </>
-            )}
+                <Link
+                  to={item.linkTo}
+                  className={`relative group py-2 text-lg font-medium transition-colors duration-300 ${
+                    location.pathname === item.linkTo
+                      ? "text-red-500"
+                      : "text-white hover:text-red-400"
+                  }`}
+                >
+                  <span className="relative z-10">{item.text}</span>
+                  <motion.span
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 rounded-full"
+                    initial={{ scaleX: 0 }}
+                    animate={{
+                      scaleX: location.pathname === item.linkTo ? 1 : 0,
+                    }}
+                    whileHover={{ scaleX: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Link>
+              </motion.div>
+            ))}
           </div>
 
           {/* Action Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            {isAuthenticated ? (
+            <Link to={navbarContent.button_1.linkTo}>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={onLogout}
                 className="px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300 relative group"
               >
-                <span className="relative z-10">Logout</span>
+                <span className="relative z-10">
+                  {navbarContent.button_1.text}
+                </span>
                 <motion.div
                   className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/20 to-transparent"
                   initial={{ opacity: 0 }}
@@ -266,40 +162,25 @@ const NavbarComponent = ({ isAuthenticated, onLogout }) => {
                   transition={{ duration: 0.3 }}
                 />
               </motion.button>
-            ) : (
-              <>
-                <Link to="/signup">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300 relative group"
-                  >
-                    <span className="relative z-10">Sign Up</span>
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/20 to-transparent"
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </motion.button>
-                </Link>
-                <Link to="/signin">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full relative overflow-hidden group"
-                  >
-                    <span className="relative z-10">Sign In</span>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700"
-                      initial={{ x: "100%" }}
-                      whileHover={{ x: 0 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </motion.button>
-                </Link>
-              </>
-            )}
+            </Link>
+
+            <Link to={navbarContent.button_2.linkTo}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full relative overflow-hidden group"
+              >
+                <span className="relative z-10">
+                  {navbarContent.button_2.text}
+                </span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700"
+                  initial={{ x: "100%" }}
+                  whileHover={{ x: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -345,121 +226,43 @@ const NavbarComponent = ({ isAuthenticated, onLogout }) => {
               className="lg:hidden bg-black/95 backdrop-blur-lg border-t border-red-500/10"
             >
               <div className="px-6 py-4 space-y-4">
-                {/* Always show these links */}
-                <motion.div variants={menuItemVariants}>
-                  <Link
-                    to="/"
-                    className={`block py-2 text-lg transition-colors duration-300 ${
-                      location.pathname === "/"
-                        ? "text-red-500"
-                        : "text-white hover:text-red-400"
-                    }`}
-                    onClick={() => setOpenNav(false)}
+                {navbarContent.navLinks.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    variants={menuItemVariants}
+                    className="transform-gpu"
                   >
-                    Home
-                  </Link>
-                </motion.div>
-                <motion.div variants={menuItemVariants}>
-                  <Link
-                    to="/about"
-                    className={`block py-2 text-lg transition-colors duration-300 ${
-                      location.pathname === "/about"
-                        ? "text-red-500"
-                        : "text-white hover:text-red-400"
-                    }`}
-                    onClick={() => setOpenNav(false)}
-                  >
-                    About
-                  </Link>
-                </motion.div>
-                <motion.div variants={menuItemVariants}>
-                  <Link
-                    to="/contact"
-                    className={`block py-2 text-lg transition-colors duration-300 ${
-                      location.pathname === "/contact"
-                        ? "text-red-500"
-                        : "text-white hover:text-red-400"
-                    }`}
-                    onClick={() => setOpenNav(false)}
-                  >
-                    Contact
-                  </Link>
-                </motion.div>
-                <motion.div variants={menuItemVariants}>
-                  <Link
-                    to="/services"
-                    className={`block py-2 text-lg transition-colors duration-300 ${
-                      location.pathname === "/services"
-                        ? "text-red-500"
-                        : "text-white hover:text-red-400"
-                    }`}
-                    onClick={() => setOpenNav(false)}
-                  >
-                    Services
-                  </Link>
-                </motion.div>
-
-                {/* Conditionally render Schedule and Community links for authenticated users */}
-                {isAuthenticated && (
-                  <>
-                    <motion.div variants={menuItemVariants}>
-                      <Link
-                        to="/community"
-                        className={`block py-2 text-lg transition-colors duration-300 ${
-                          location.pathname === "/community"
-                            ? "text-red-500"
-                            : "text-white hover:text-red-400"
-                        }`}
-                        onClick={() => setOpenNav(false)}
-                      >
-                        Community
-                      </Link>
-                    </motion.div>
-                    <motion.div variants={menuItemVariants}>
-                      <Link
-                        to="/schedule"
-                        className={`block py-2 text-lg transition-colors duration-300 ${
-                          location.pathname === "/schedule"
-                            ? "text-red-500"
-                            : "text-white hover:text-red-400"
-                        }`}
-                        onClick={() => setOpenNav(false)}
-                      >
-                        Schedule
-                      </Link>
-                    </motion.div>
-                  </>
-                )}
-
-                <motion.div variants={menuItemVariants} className="pt-4 space-y-3">
-                  {isAuthenticated ? (
-                    <motion.button
-                      onClick={() => {
-                        onLogout();
-                        setOpenNav(false);
-                      }}
-                      className="block w-full text-center px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300"
+                    <Link
+                      to={item.linkTo}
+                      className={`block py-2 text-lg transition-colors duration-300 ${
+                        location.pathname === item.linkTo
+                          ? "text-red-500"
+                          : "text-white hover:text-red-400"
+                      }`}
+                      onClick={() => setOpenNav(false)}
                     >
-                      Logout
-                    </motion.button>
-                  ) : (
-                    <>
-                      <Link
-                        to="/signup"
-                        className="block w-full text-center px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300"
-                        onClick={() => setOpenNav(false)}
-                      >
-                        Sign Up
-                      </Link>
-                      <Link
-                        to="/signin"
-                        className="block w-full text-center px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full transition-all duration-300"
-                        onClick={() => setOpenNav(false)}
-                      >
-                        Sign In
-                      </Link>
-                    </>
-                  )}
+                      {item.text}
+                    </Link>
+                  </motion.div>
+                ))}
+                <motion.div
+                  variants={menuItemVariants}
+                  className="pt-4 space-y-3"
+                >
+                  <Link
+                    to={navbarContent.button_1.linkTo}
+                    className="block w-full text-center px-6 py-2.5 text-white border border-red-500/30 rounded-full hover:bg-red-500/10 transition-all duration-300"
+                    onClick={() => setOpenNav(false)}
+                  >
+                    {navbarContent.button_1.text}
+                  </Link>
+                  <Link
+                    to={navbarContent.button_2.linkTo}
+                    className="block w-full text-center px-6 py-2.5 bg-gradient-to-r from-red-700 to-red-500 text-white rounded-full transition-all duration-300"
+                    onClick={() => setOpenNav(false)}
+                  >
+                    {navbarContent.button_2.text}
+                  </Link>
                 </motion.div>
               </div>
             </motion.div>
@@ -468,10 +271,6 @@ const NavbarComponent = ({ isAuthenticated, onLogout }) => {
       </div>
     </motion.div>
   );
-};
-NavbarComponent.propTypes = {
-  isAuthenticated: PropTypes.bool.isRequired,
-  onLogout: PropTypes.func.isRequired,
 };
 
 export default NavbarComponent;

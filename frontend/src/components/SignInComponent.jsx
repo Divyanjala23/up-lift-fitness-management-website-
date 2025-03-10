@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, User, Lock, ChevronRight, Zap, ArrowRight } from "lucide-react";
 import Image_1 from "../assets/images/Bgs/SignInImg.jpg";
+import { jwtDecode } from "jwt-decode";
 
 const SignInComponent = () => {
   const [loginData, setLoginData] = useState({
@@ -43,12 +44,21 @@ const SignInComponent = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const { id, role } = data;
-        localStorage.setItem("userId", id);
+        const { token } = data; // Get JWT token from response
 
-        if (role === "ADMIN") navigate("/admin");
-        else if (role === "MEMBER") navigate("/member");
-        else if (role === "COACH") navigate("/coach");
+        // Store JWT token in localStorage
+        localStorage.setItem("token", token);
+
+        // Decode JWT to get user details
+        const decodedToken = jwtDecode(token);
+        localStorage.setItem("userId", decodedToken.id);
+        localStorage.setItem("username", decodedToken.username);
+        localStorage.setItem("role", decodedToken.role);
+
+        // Navigate to the appropriate dashboard
+        if (decodedToken.role === "ADMIN") navigate("api/admin");
+        else if (decodedToken.role === "MEMBER") navigate("/api/members");
+        else if (decodedToken.role === "COACH") navigate("/api/coaches");
         else setError("Unknown role detected. Please contact support.");
       } else {
         setError(data.message || "Login failed. Please try again.");

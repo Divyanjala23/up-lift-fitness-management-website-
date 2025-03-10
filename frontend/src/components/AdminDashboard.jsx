@@ -419,29 +419,40 @@ const VideoCard = ({ video }) => {
     }
   };
 
+  // Handle play on hover
+  const handleMouseEnter = (e) => {
+    e.target.play();
+  };
+
+  const handleMouseLeave = (e) => {
+    e.target.pause();
+  };
+
   return (
-    <div className="group relative h-40 w-full cursor-pointer overflow-hidden rounded-lg bg-gray-500 transition-all duration-200 ease-in-out hover:scale-105 hover:border hover:border-red-500">
+    <div className="group relative w-full cursor-pointer overflow-hidden rounded-lg bg-gray-500 transition-all duration-200 ease-in-out hover:scale-105 hover:border hover:border-red-500">
+      {/* Video Thumbnail */}
       <video
-        src={`http://localhost:8080/${video.filePath}`}  // Ensure backend serves the video file correctly
-        className="h-full w-full object-cover"
+        src={`http://localhost:8080/api/videos/${video.fileName}`}  // Ensure backend serves the video file correctly
+        className="h-60 w-full object-cover"
         controls
+        onMouseEnter={handleMouseEnter}  // Play video on hover
+        onMouseLeave={handleMouseLeave}  // Pause video on mouse leave
       />
-      <div className="absolute inset-0 grid w-full translate-y-80 place-content-center bg-black/50 transition-all duration-200 ease-in-out group-hover:translate-y-0">
-        <div className="mx-auto flex w-4/5 flex-col items-center justify-center">
-          <h4 className="mb-2 text-lg font-semibold text-white antialiased">
-            {video.title || "Untitled Video"}
-          </h4>
-        </div>
+      
+      {/* Title and Delete Button Outside the Video */}
+      {/* <div className="absolute bottom-0 w-full bg-black/50 p-3 flex justify-between items-center transition-all duration-200 ease-in-out group-hover:bg-black/70">
+        <h4 className="text-lg font-semibold text-white antialiased truncate">{video.title || "Untitled Video"}</h4>
         <button
           onClick={handleDelete}
-          className="group/btnDel fixed right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 p-1 hover:scale-105 hover:bg-red-500 hover:shadow-md hover:shadow-red-500"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 p-2 hover:bg-red-500 hover:scale-110 hover:shadow-md hover:shadow-red-500"
         >
-          <Trash2 className="h-5 w-5 transition-all duration-200 ease-in-out group-hover/btnDel:text-gray-300" />
+          <Trash2 className="h-5 w-5 text-gray-700 transition-all duration-200 ease-in-out hover:text-white" />
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
+
 
 const CommunitySection = () => {
   const [posts, setPosts] = useState([
