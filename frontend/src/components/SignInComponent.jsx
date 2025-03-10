@@ -4,7 +4,7 @@ import { Eye, EyeOff, User, Lock, ChevronRight, Zap, ArrowRight } from "lucide-r
 import Image_1 from "../assets/images/Bgs/SignInImg.jpg";
 import { jwtDecode } from "jwt-decode";
 
-const SignInComponent = () => {
+const SignInComponent = ({ onLogin }) => {
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
@@ -55,10 +55,13 @@ const SignInComponent = () => {
         localStorage.setItem("username", decodedToken.username);
         localStorage.setItem("role", decodedToken.role);
 
-        // Navigate to the appropriate dashboard
-        if (decodedToken.role === "ADMIN") navigate("api/admin");
-        else if (decodedToken.role === "MEMBER") navigate("/api/members");
-        else if (decodedToken.role === "COACH") navigate("/api/coaches");
+        // Call onLogin to update authentication state
+        onLogin();
+
+        // Navigate to the home page
+        if (decodedToken.role === "ADMIN") navigate("/admin");
+        else if (decodedToken.role === "MEMBER") navigate("/member");
+        else if (decodedToken.role === "COACH") navigate("/coach");
         else setError("Unknown role detected. Please contact support.");
       } else {
         setError(data.message || "Login failed. Please try again.");
