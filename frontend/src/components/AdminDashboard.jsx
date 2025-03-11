@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiService } from "./apiservice";
 import {
   Users,
@@ -17,8 +18,11 @@ import {
   Edit,
   Check,
   Package,
+  Home,
   UserPlus,
   ArrowUp,
+  LogOut,
+  
 } from "lucide-react";
 import {
   LineChart as RechartsLineChart,
@@ -45,6 +49,7 @@ import Thumbnail from "../assets/images/Bgs/SignInImg.jpg";
 import VideoAddForm from "./VideoAddForm";
 import AssignCoach from "./AssignCoach";
 import CommunityForum from "./CommunityForum";
+
 // ... (keep existing imports)
 const StatsCard = ({ icon: Icon, label, value, trend }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
@@ -754,27 +759,52 @@ const AdminDashboard = () => {
   const [currentSection, setCurrentSection] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  
-  // State for data
+  const [loading, setLoading] = useState(true); // Define loading state
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  // Logout function
+  const handleLogout = () => {
+    // Clear user session/token (example: remove from localStorage)
+    localStorage.removeItem("authToken"); // Replace "authToken" with your actual token key
+
+    // Redirect to the login page
+    navigate("/signin"); // Replace "/login" with your login route
+  };
+
+  // Handle navigation item clicks
+  const handleNavigationClick = (value) => {
+    if (value === "logout") {
+      handleLogout(); // Call logout function
+    }
+    else if (value === "home") {
+      navigate("/"); // Redirect to the home page
+    } else {
+      setCurrentSection(value); // Set the current section
+    }
+    setIsMobileMenuOpen(false); // Close mobile menu
+  };
 
   const [memberData, setMemberData] = useState([]);
-  const [trainerData, setTrainerData] = useState([]);
-  const [revenueData, setRevenueData] = useState([]);
-  const [activityData, setActivityData] = useState([]);
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const [trainerData, setTrainerData] = useState([]);
+const [videos, setVideos] = useState([]);
+const [revenueData, setRevenueData] = useState([]);
+const [activityData, setActivityData] = useState([]);
 
   const navigationItems = [
+    { value: "home", label: "Home", icon: Home },
     { value: "dashboard", label: "Dashboard", icon: BarChart },
     { value: "members", label: "Members", icon: Users },
     { value: "trainers", label: "Trainers", icon: Users },
     { value: "assign-coach", label: "Assign Coach", icon: UserPlus },
     { value: "videos", label: "Videos", icon: Video },
-    { value: "community" ,label: "Community",icon: MessageSquare,  },
+    { value: "community", label: "Community", icon: MessageSquare },
     { value: "subscriptions", label: "Subscriptions", icon: CreditCard },
     { value: "settings", label: "Settings", icon: Settings },
+    { value: "logout", label: "Logout", icon: LogOut }, 
+    
   ];
+
   
   const [statsData, setStatsData] = useState({
     members: { total: 0, trend: 0 },
@@ -1072,10 +1102,7 @@ const AdminDashboard = () => {
           {navigationItems.map((item) => (
             <button
               key={item.value}
-              onClick={() => {
-                setCurrentSection(item.value);
-                setIsMobileMenuOpen(false);
-              }}
+              onClick={() => handleNavigationClick(item.value)} // Use handleNavigationClick
               className={`flex w-full items-center gap-4 px-6 py-3 text-sm ${
                 currentSection === item.value
                   ? "bg-red-500/10 text-red-500"
@@ -1116,4 +1143,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
