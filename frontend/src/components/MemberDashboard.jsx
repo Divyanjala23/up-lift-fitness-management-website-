@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { format } from "date-fns"; 
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { format } from "date-fns";
 import {
   Activity,
   Calendar,
@@ -23,6 +24,7 @@ import {
   Edit,
   Trash,
   ArrowRight,
+  Home, // Import Home icon
 } from 'lucide-react';
 import {
   LineChart,
@@ -461,7 +463,6 @@ const ProgressContent = () => {
     return <div className="text-red-500">Error: {error}</div>;
   }
 
-
   return (
     <div className="space-y-6">
       <Card>
@@ -511,6 +512,7 @@ const MemberDashboard = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [memberProfile, setMemberProfile] = useState({});
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // Use navigate for redirection
 
   // Fetch member profile
   useEffect(() => {
@@ -535,11 +537,9 @@ const MemberDashboard = () => {
         }
         return res.json();
       })
-      
       .then((data) => {
-    console.log("API Response:", data); // Log the API response
-    setMemberProfile(data); // Set the member profile state
-  })
+        setMemberProfile(data);
+      })
       .catch((err) => {
         console.error("Error fetching user data:", err);
         setError(err.message);
@@ -547,16 +547,33 @@ const MemberDashboard = () => {
   }, [userId, token]);
 
   const navigationItems = [
+    { label: 'Home', icon: Home, content: 'Home' }, 
     { label: 'Dashboard', icon: Activity, content: 'Dashboard Content' },
     { label: 'Workouts', icon: Dumbbell, content: 'Workouts Content' },
     { label: 'Nutrition', icon: Apple, content: 'Nutrition Content' },
     { label: 'Goals', icon: Target, content: 'Goals Content' },
     { label: 'Progress', icon: TrendingUp, content: 'Progress Content' },
+    { label: 'Logout', icon: LogOut, content: 'Logout' }, 
   ];
 
   const handleNavClick = (label) => {
-    setActiveSection(label);
-    setIsMobileMenuOpen(false);
+    if (label === 'Home') {
+      navigate('/'); // Redirect to the home page
+    } else if (label === 'Logout') {
+      handleLogout(); // Call the logout function
+    } else {
+      setActiveSection(label); // Set the active section
+    }
+    setIsMobileMenuOpen(false); // Close mobile menu
+  };
+
+  const handleLogout = () => {
+    // Clear user session/token (example: remove from localStorage)
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+
+    // Redirect to the login page
+    navigate("/signin"); // Replace "/signin" with your login route
   };
 
   const handleNotificationClick = (id) => {
@@ -727,109 +744,109 @@ const MemberDashboard = () => {
 
         {/* Dynamic Content Section */}
         <main className="p-6">
-      {activeSection === "Dashboard" && (
-        <>
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">
-              Welcome back, {memberProfile.fullName}!
-            </h2>
-            <p className="text-gray-400">Track your fitness journey and progress</p>
-          </div>
-
-          <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
-              <StatsCard
-                icon={Heart}
-                label="Calories Burned"
-                value="1,230 kcal"
-                trend={8}
-                color="red"
-              />
-              <StatsCard
-                icon={Clock}
-                label="Workout Time"
-                value="2.1 hrs"
-                trend={6}
-                color="blue"
-              />
-              <StatsCard
-                icon={Trophy}
-                label="Achievements"
-                value="12"
-                trend={3}
-                color="yellow"
-              />
-              <StatsCard
-                icon={Calendar}
-                label="Streak"
-                value="18 days"
-                trend={10}
-                color="green"
-              />
-              <StatsCard
-                icon={Activity}
-                label="Steps Taken"
-                value="12,540 steps"
-                trend={15}
-                color="purple"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <ProgressChart />
-              <WorkoutSchedule />
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div className="md:col-span-2">
-                <NutritionTracker />
+          {activeSection === "Dashboard" && (
+            <>
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-white">
+                  Welcome back, {memberProfile.fullName}!
+                </h2>
+                <p className="text-gray-400">Track your fitness journey and progress</p>
               </div>
-            </div>
-          </div>
-        </>
-      )}
 
-      {activeSection === "Workouts" && (
-        <>
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">Workouts</h2>
-            <p className="text-gray-400">Track and review your workout history</p>
-          </div>
-          <WorkoutsContent />
-        </>
-      )}
+              <div className="space-y-6">
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
+                  <StatsCard
+                    icon={Heart}
+                    label="Calories Burned"
+                    value="1,230 kcal"
+                    trend={8}
+                    color="red"
+                  />
+                  <StatsCard
+                    icon={Clock}
+                    label="Workout Time"
+                    value="2.1 hrs"
+                    trend={6}
+                    color="blue"
+                  />
+                  <StatsCard
+                    icon={Trophy}
+                    label="Achievements"
+                    value="12"
+                    trend={3}
+                    color="yellow"
+                  />
+                  <StatsCard
+                    icon={Calendar}
+                    label="Streak"
+                    value="18 days"
+                    trend={10}
+                    color="green"
+                  />
+                  <StatsCard
+                    icon={Activity}
+                    label="Steps Taken"
+                    value="12,540 steps"
+                    trend={15}
+                    color="purple"
+                  />
+                </div>
 
-      {activeSection === "Nutrition" && (
-        <>
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">Nutrition</h2>
-            <p className="text-gray-400">Monitor your daily food intake</p>
-          </div>
-          <NutritionContent />
-        </>
-      )}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <ProgressChart />
+                  <WorkoutSchedule />
+                </div>
 
-      {activeSection === "Goals" && (
-        <>
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">Fitness Goals</h2>
-            <p className="text-gray-400">Track and manage your fitness objectives</p>
-          </div>
-          <GoalsContent />
-        </>
-      )}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <div className="md:col-span-2">
+                    <NutritionTracker />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
-      {activeSection === "Progress" && (
-        <>
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">Progress Tracking</h2>
-            <p className="text-gray-400">Monitor your fitness journey metrics</p>
-          </div>
-          <ProgressContent />
-        </>
-      )}
-    </main>
+          {activeSection === "Workouts" && (
+            <>
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-white">Workouts</h2>
+                <p className="text-gray-400">Track and review your workout history</p>
+              </div>
+              <WorkoutsContent />
+            </>
+          )}
+
+          {activeSection === "Nutrition" && (
+            <>
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-white">Nutrition</h2>
+                <p className="text-gray-400">Monitor your daily food intake</p>
+              </div>
+              <NutritionContent />
+            </>
+          )}
+
+          {activeSection === "Goals" && (
+            <>
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-white">Fitness Goals</h2>
+                <p className="text-gray-400">Track and manage your fitness objectives</p>
+              </div>
+              <GoalsContent />
+            </>
+          )}
+
+          {activeSection === "Progress" && (
+            <>
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-white">Progress Tracking</h2>
+                <p className="text-gray-400">Monitor your fitness journey metrics</p>
+              </div>
+              <ProgressContent />
+            </>
+          )}
+        </main>
       </div>
     </div>
   );
