@@ -250,26 +250,46 @@ const WorkoutsContent = () => {
 };
 
 const NutritionContent = () => {
-  const [mealLog, setMealLog] = useState([
-    {
-      id: 1,
-      name: 'Breakfast',
-      items: [
-        { food: 'Oatmeal', calories: 300, protein: 15, carbs: 50 },
-        { food: 'Protein Shake', calories: 150, protein: 25, carbs: 10 },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Lunch',
-      items: [
-        { food: 'Grilled Chicken', calories: 250, protein: 35, carbs: 0 },
-        { food: 'Brown Rice', calories: 200, protein: 5, carbs: 45 },
-      ],
-    },
-  ]);
+  const [nutritionData, setNutritionData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const dailyTotals = mealLog.reduce(
+  useEffect(() => {
+    if (!userId || !token) return;
+
+    fetch(`http://localhost:8080/api/nutrition/member/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: Unable to fetch nutrition data.`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setNutritionData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching nutrition data:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId, token]);
+
+  if (loading) {
+    return <div className="text-gray-400">Loading nutrition data...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
+
+  const dailyTotals = nutritionData.reduce(
     (acc, meal) => {
       meal.items.forEach((item) => {
         acc.calories += item.calories;
@@ -287,7 +307,7 @@ const NutritionContent = () => {
         <CardHeader>
           <CardTitle>Daily Nutrition Log</CardTitle>
         </CardHeader>
-        {mealLog.map((meal) => (
+        {nutritionData.map((meal) => (
           <div key={meal.id} className="border-b border-red-500/10 pb-4 mb-4">
             <h4 className="text-white font-semibold mb-2">{meal.name}</h4>
             {meal.items.map((item, index) => (
@@ -321,11 +341,44 @@ const NutritionContent = () => {
 };
 
 const GoalsContent = () => {
-  const [goals, setGoals] = useState([
-    { id: 1, name: 'Lose Weight', target: '10 lbs', progress: 4, status: 'In Progress' },
-    { id: 2, name: 'Build Muscle', target: '5 lbs muscle mass', progress: 2, status: 'In Progress' },
-    { id: 3, name: 'Run 5K', target: '30 min', progress: 25, status: 'Completed' },
-  ]);
+  const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!userId || !token) return;
+
+    fetch(`http://localhost:8080/api/goals/member/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: Unable to fetch goals data.`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setGoals(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching goals data:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId, token]);
+
+  if (loading) {
+    return <div className="text-gray-400">Loading goals...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -369,11 +422,45 @@ const GoalsContent = () => {
 };
 
 const ProgressContent = () => {
-  const progressData = [
-    { name: 'Weight', current: 180, goal: 165, unit: 'lbs' },
-    { name: 'Body Fat', current: 22, goal: 18, unit: '%' },
-    { name: 'Strength', current: 100, goal: 150, unit: 'lbs max lift' },
-  ];
+  const [progressData, setProgressData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!userId || !token) return;
+
+    fetch(`http://localhost:8080/api/progress/member/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: Unable to fetch progress data.`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setProgressData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching progress data:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId, token]);
+
+  if (loading) {
+    return <div className="text-gray-400">Loading progress data...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
+
 
   return (
     <div className="space-y-6">
@@ -450,9 +537,9 @@ const MemberDashboard = () => {
       })
       
       .then((data) => {
-        console.log("API Response:", data); // Log the API response
-        setMemberProfile(data); // Set the member profile state
-      })
+    console.log("API Response:", data); // Log the API response
+    setMemberProfile(data); // Set the member profile state
+  })
       .catch((err) => {
         console.error("Error fetching user data:", err);
         setError(err.message);
@@ -640,99 +727,109 @@ const MemberDashboard = () => {
 
         {/* Dynamic Content Section */}
         <main className="p-6">
-          {activeSection === 'Dashboard' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Welcome back, {memberProfile.fullName}!</h2>
-                <p className="text-gray-400">Track your fitness journey and progress</p>
+      {activeSection === "Dashboard" && (
+        <>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white">
+              Welcome back, {memberProfile.fullName}!
+            </h2>
+            <p className="text-gray-400">Track your fitness journey and progress</p>
+          </div>
+
+          <div className="space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
+              <StatsCard
+                icon={Heart}
+                label="Calories Burned"
+                value="1,230 kcal"
+                trend={8}
+                color="red"
+              />
+              <StatsCard
+                icon={Clock}
+                label="Workout Time"
+                value="2.1 hrs"
+                trend={6}
+                color="blue"
+              />
+              <StatsCard
+                icon={Trophy}
+                label="Achievements"
+                value="12"
+                trend={3}
+                color="yellow"
+              />
+              <StatsCard
+                icon={Calendar}
+                label="Streak"
+                value="18 days"
+                trend={10}
+                color="green"
+              />
+              <StatsCard
+                icon={Activity}
+                label="Steps Taken"
+                value="12,540 steps"
+                trend={15}
+                color="purple"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <ProgressChart />
+              <WorkoutSchedule />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="md:col-span-2">
+                <NutritionTracker />
               </div>
+            </div>
+          </div>
+        </>
+      )}
 
-              <div className="space-y-6">
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-                  <StatsCard
-                    icon={Heart}
-                    label="Calories Burned"
-                    value="847 kcal"
-                    trend={12}
-                  />
-                  <StatsCard
-                    icon={Clock}
-                    label="Workout Time"
-                    value="1.5 hrs"
-                    trend={5}
-                    color="blue"
-                  />
-                  <StatsCard
-                    icon={Trophy}
-                    label="Achievements"
-                    value="8"
-                    trend={0}
-                    color="yellow"
-                  />
-                  <StatsCard
-                    icon={Calendar}
-                    label="Streak"
-                    value="12 days"
-                    trend={20}
-                    color="green"
-                  />
-                </div>
+      {activeSection === "Workouts" && (
+        <>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white">Workouts</h2>
+            <p className="text-gray-400">Track and review your workout history</p>
+          </div>
+          <WorkoutsContent />
+        </>
+      )}
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <ProgressChart />
-                  <WorkoutSchedule />
-                </div>
+      {activeSection === "Nutrition" && (
+        <>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white">Nutrition</h2>
+            <p className="text-gray-400">Monitor your daily food intake</p>
+          </div>
+          <NutritionContent />
+        </>
+      )}
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                  <div className="md:col-span-2">
-                    <NutritionTracker />
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+      {activeSection === "Goals" && (
+        <>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white">Fitness Goals</h2>
+            <p className="text-gray-400">Track and manage your fitness objectives</p>
+          </div>
+          <GoalsContent />
+        </>
+      )}
 
-          {activeSection === 'Workouts' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Workouts</h2>
-                <p className="text-gray-400">Track and review your workout history</p>
-              </div>
-              <WorkoutsContent />
-            </>
-          )}
-
-          {activeSection === 'Nutrition' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Nutrition</h2>
-                <p className="text-gray-400">Monitor your daily food intake</p>
-              </div>
-              <NutritionContent />
-            </>
-          )}
-
-          {activeSection === 'Goals' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Fitness Goals</h2>
-                <p className="text-gray-400">Track and manage your fitness objectives</p>
-              </div>
-              <GoalsContent />
-            </>
-          )}
-
-          {activeSection === 'Progress' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Progress Tracking</h2>
-                <p className="text-gray-400">Monitor your fitness journey metrics</p>
-              </div>
-              <ProgressContent />
-            </>
-          )}
-        </main>
+      {activeSection === "Progress" && (
+        <>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white">Progress Tracking</h2>
+            <p className="text-gray-400">Monitor your fitness journey metrics</p>
+          </div>
+          <ProgressContent />
+        </>
+      )}
+    </main>
       </div>
     </div>
   );
