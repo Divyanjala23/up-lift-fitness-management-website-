@@ -6,11 +6,11 @@ import HeroComponent from "./components/HeroComponent";
 import BMICalculatorComponent from "./components/BMICalculatorComponent";
 import About from "./components/About";
 import SignInComponent from "./components/SignInComponent";
-import SignUpComponent from "./components/SIgnUpComponent";
+import SignUpComponent from "./components/SignUpComponent";
 import CommunityForum from "./components/CommunityForum";
 import ContactUs from "./components/ContactUs";
 import Services from "./components/Services";
-import Schedule from "./components/Shedule";
+import Shedule from "./components/Shedule";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
 import MemberDashboard from "./components/MemberDashboard";
@@ -18,21 +18,29 @@ import CoachDashboard from "./components/CoachDashboard";
 import PaymentGateway from "./components/PaymentGateway";
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem("isAuthenticated") === "true"
+  );
 
   const handleLogin = () => {
     setIsAuthenticated(true);
+    localStorage.setItem("isAuthenticated", "true");
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem("isAuthenticated");
   };
 
   const ProtectedRoute = ({ element }) => {
-    return isAuthenticated ? element : <Navigate to="/signin" />;
+    if (!isAuthenticated) {
+      console.log("User not authenticated, redirecting to /signin");
+      return <Navigate to="/signin" />;
+    }
+    console.log("User authenticated, rendering protected component");
+    return element;
   };
 
-  // Wrapper component to conditionally render Navbar
   const Layout = ({ children, includeNavbar = true }) => {
     const location = useLocation();
     const isDashboardRoute =
@@ -42,7 +50,7 @@ const App = () => {
 
     return (
       <>
-        {includeNavbar && !isDashboardRoute && <Navbar isAuthenticated={isAuthenticated} />}
+        {includeNavbar && !isDashboardRoute && <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
         {children}
         {includeNavbar && !isDashboardRoute && <Footer />}
       </>
@@ -108,27 +116,47 @@ const App = () => {
         {/* Protected Routes */}
         <Route
           path="/community"
-          element={<ProtectedRoute element={<CommunityForum />} />}
+          element={
+            <Layout>
+              <ProtectedRoute element={<CommunityForum />} />
+            </Layout>
+          }
         />
         <Route
-          path="/schedule"
-          element={<ProtectedRoute element={<Schedule />} />}
+          path="/shedule"
+          element={
+            <Layout>
+              <ProtectedRoute element={<Shedule />} />
+            </Layout>
+          }
         />
         <Route
           path="/admin"
-          element={<ProtectedRoute element={<AdminDashboard />} />}
+          element={
+            <ProtectedRoute element={<AdminDashboard />} />
+          }
         />
         <Route
           path="/member"
-          element={<ProtectedRoute element={<MemberDashboard />} />}
+          element={
+            <ProtectedRoute element={
+              <Layout includeNavbar={false}>
+                <MemberDashboard />
+              </Layout>
+            } />
+          }
         />
         <Route
           path="/coach"
-          element={<ProtectedRoute element={<CoachDashboard />} />}
+          element={
+            <ProtectedRoute element={<CoachDashboard />} />
+          }
         />
         <Route
           path="/payment"
-          element={<ProtectedRoute element={<PaymentGateway />} />}
+          element={
+            <ProtectedRoute element={<PaymentGateway />} />
+          }
         />
       </Routes>
     </Router>

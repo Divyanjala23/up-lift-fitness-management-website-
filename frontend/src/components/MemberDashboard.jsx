@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { format } from "date-fns";
+import { motion } from "framer-motion";
+import PaymentGateway from './PaymentGateway';
 import {
   Activity,
   Calendar,
@@ -24,7 +26,8 @@ import {
   Edit,
   Trash,
   ArrowRight,
-  Home, // Import Home icon
+  Home,
+  DollarSign, // Import Home icon
 } from 'lucide-react';
 import {
   LineChart,
@@ -171,13 +174,20 @@ const NutritionTracker = () => {
   );
 };
 
-const userId = localStorage.getItem("userId");
-const token = localStorage.getItem("token"); // Retrieve the JWT token
 
 const WorkoutsContent = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+const [token, setToken] = useState(localStorage.getItem("token"));
+
+useEffect(() => {
+  // Optionally, you can sync the localStorage and state if they change dynamically
+  localStorage.setItem("userId", userId);
+  localStorage.setItem("token", token);
+}, [userId, token]); // Retrieve the JWT token
+
 
   // Fetch workouts data from the backend
   useEffect(() => {
@@ -255,6 +265,15 @@ const NutritionContent = () => {
   const [nutritionData, setNutritionData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+const [token, setToken] = useState(localStorage.getItem("token"));
+
+useEffect(() => {
+  // Optionally, you can sync the localStorage and state if they change dynamically
+  localStorage.setItem("userId", userId);
+  localStorage.setItem("token", token);
+}, [userId, token]); // Retrieve the JWT token
+
 
   useEffect(() => {
     if (!userId || !token) return;
@@ -342,10 +361,26 @@ const NutritionContent = () => {
   );
 };
 
+
 const GoalsContent = () => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
+
+  // New goal state and form visibility toggle
+  const [newGoal, setNewGoal] = useState({
+    name: "",
+    target: "",
+    progress: 0,
+    status: "In Progress", // Default status
+  });
+  const [isFormVisible, setFormVisible] = useState(false);
+
+  // Editing goal state and form visibility toggle
+  const [editingGoal, setEditingGoal] = useState(null);
+  const [isEditFormVisible, setEditFormVisible] = useState(false);
 
   useEffect(() => {
     if (!userId || !token) return;
@@ -374,6 +409,96 @@ const GoalsContent = () => {
       });
   }, [userId, token]);
 
+  const handleGoalChange = (e) => {
+    const { name, value } = e.target;
+    setNewGoal((prevGoal) => ({
+      ...prevGoal,
+      [name]: value,
+    }));
+  };
+
+  const handleGoalSubmit = (e) => {
+    e.preventDefault();
+
+    const goalData = { ...newGoal, memberId: userId, coachId: "defaultCoachId" };
+
+    fetch("http://localhost:8080/api/goals", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(goalData),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setGoals((prevGoals) => [...prevGoals, data]);
+        setNewGoal({ name: "", target: "", progress: 0, status: "In Progress" });
+        setFormVisible(false); // Hide form after submitting
+      })
+      .catch((err) => {
+        console.error("Error creating goal:", err);
+        setError("Error creating goal.");
+      });
+  };
+
+  const handleGoalDelete = (goalId) => {
+    fetch(`http://localhost:8080/api/goals/${goalId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+      .then(() => {
+        setGoals(goals.filter((goal) => goal.id !== goalId));
+      })
+      .catch((err) => {
+        console.error("Error deleting goal:", err);
+        setError("Error deleting goal.");
+      });
+  };
+
+  // Set up the goal for editing
+  const handleGoalEdit = (goal) => {
+    setEditingGoal(goal);
+    setEditFormVisible(true);
+  };
+
+  const handleEditGoalChange = (e) => {
+    const { name, value } = e.target;
+    setEditingGoal((prevGoal) => ({
+      ...prevGoal,
+      [name]: value,
+    }));
+  };
+
+  const handleGoalUpdate = (e) => {
+    e.preventDefault();
+
+    fetch(`http://localhost:8080/api/goals/${editingGoal.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(editingGoal),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const updatedGoals = goals.map((goal) =>
+          goal.id === data.id ? data : goal
+        );
+        setGoals(updatedGoals);
+        setEditingGoal(null);
+        setEditFormVisible(false); // Hide edit form after updating
+      })
+      .catch((err) => {
+        console.error("Error updating goal:", err);
+        setError("Error updating goal.");
+      });
+  };
+
   if (loading) {
     return <div className="text-gray-400">Loading goals...</div>;
   }
@@ -382,24 +507,130 @@ const GoalsContent = () => {
     return <div className="text-red-500">Error: {error}</div>;
   }
 
+  // Calculate progress percentage
+  const calculateProgress = (current, target) => {
+    if (target === 0) return 0
+    if (current<target)   return Math.min((current / target) * 100, 100); 
+    else return Math.min((target / current) * 100, 100);
+   // Ensure the progress doesn't exceed 100%
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>My Fitness Goals</CardTitle>
         </CardHeader>
+
+        {/* New Goal Form Button */}
+        <button
+          className="bg-blue-500 text-white py-2 px-4 rounded"
+          onClick={() => setFormVisible(!isFormVisible)}
+        >
+          {isFormVisible ? "Cancel" : "Add New Goal"}
+        </button>
+
+        {/* New Goal Form */}
+        {isFormVisible && (
+          <form className="mt-4" onSubmit={handleGoalSubmit}>
+            <input
+              type="text"
+              name="name"
+              value={newGoal.name}
+              onChange={handleGoalChange}
+              placeholder="Goal Name"
+              className="input"
+              required
+            />
+            <input
+              type="text"
+              name="target"
+              value={newGoal.target}
+              onChange={handleGoalChange}
+              placeholder="Target"
+              className="input"
+              required
+            />
+            <input
+              type="number"
+              name="progress"
+              value={newGoal.progress}
+              onChange={handleGoalChange}
+              placeholder="Current"
+              className="input"
+              required
+            />
+            <select
+              name="status"
+              value={newGoal.status}
+              onChange={handleGoalChange}
+              className="input"
+            >
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">
+              Save Goal
+            </button>
+          </form>
+        )}
+
+        {/* Edit Goal Form */}
+        {isEditFormVisible && editingGoal && (
+          <form className="mt-4" onSubmit={handleGoalUpdate}>
+            <input
+              type="text"
+              name="name"
+              value={editingGoal.name}
+              onChange={handleEditGoalChange}
+              placeholder="Goal Name"
+              className="input"
+              required
+            />
+            <input
+              type="text"
+              name="target"
+              value={editingGoal.target}
+              onChange={handleEditGoalChange}
+              placeholder="Target"
+              className="input"
+              required
+            />
+            <input
+              type="number"
+              name="progress"
+              value={editingGoal.progress}
+              onChange={handleEditGoalChange}
+              placeholder="Current"
+              className="input"
+              required
+            />
+            <select
+              name="status"
+              value={editingGoal.status}
+              onChange={handleEditGoalChange}
+              className="input"
+            >
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">
+              Update Goal
+            </button>
+          </form>
+        )}
+
+        {/* Display Goals */}
         {goals.map((goal) => (
           <div
             key={goal.id}
-            className={`border-b border-red-500/10 pb-4 mb-4 ${
-              goal.status === 'Completed' ? 'opacity-50' : ''
-            }`}
+            className={`border-b border-red-500/10 pb-4 mb-4 ${goal.status === "Completed" ? "opacity-50" : ""}`}
           >
             <div className="flex justify-between items-center mb-2">
               <h4 className="text-white font-semibold">{goal.name}</h4>
               <span
                 className={`text-sm ${
-                  goal.status === 'Completed' ? 'text-green-500' : 'text-yellow-500'
+                  goal.status === "Completed" ? "text-green-500" : "text-yellow-500"
                 }`}
               >
                 {goal.status}
@@ -409,13 +640,27 @@ const GoalsContent = () => {
               <div className="w-full bg-gray-700 rounded-full h-2.5 mr-4">
                 <div
                   className="bg-red-500 h-2.5 rounded-full"
-                  style={{ width: `${goal.progress * 10}%` }}
+                  style={{ width: `${calculateProgress(goal.progress, goal.target)}%` }}
                 />
               </div>
               <span className="text-gray-400 text-sm">
-                {goal.progress * 10}% of {goal.target}
+                {calculateProgress(goal.progress, goal.target).toFixed(1)}% of {goal.target}
               </span>
             </div>
+
+            {/* Edit and Delete Goal Buttons */}
+            <button
+              onClick={() => handleGoalEdit(goal)}
+              className="text-blue-500 mt-2 mr-4"
+            >
+              Edit Goal
+            </button>
+            <button
+              onClick={() => handleGoalDelete(goal.id)}
+              className="text-red-500 mt-2"
+            >
+              Delete Goal
+            </button>
           </div>
         ))}
       </Card>
@@ -423,82 +668,121 @@ const GoalsContent = () => {
   );
 };
 
-const ProgressContent = () => {
-  const [progressData, setProgressData] = useState([]);
+
+const SubscriptionsSection = () => {
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showPayment, setShowPayment] = useState(false);
+
 
   useEffect(() => {
-    if (!userId || !token) return;
-
-    fetch(`http://localhost:8080/api/progress/member/${userId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Error ${res.status}: Unable to fetch progress data.`);
-        }
-        return res.json();
-      })
+    fetch("http://localhost:8080/api/plans")
+      .then((res) => res.json())
       .then((data) => {
-        setProgressData(data);
+        setPlans(data);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error("Error fetching progress data:", err);
-        setError(err.message);
-        setLoading(false);
-      });
-  }, [userId, token]);
+      .catch((err) => console.error("Error fetching plans:", err));
+  }, []);
 
-  if (loading) {
-    return <div className="text-gray-400">Loading progress data...</div>;
-  }
+  const handlePlanSelect = (plan) => {
+    setSelectedPlan(plan);
+    setShowPayment(true);
+  };
 
-  if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
-  }
+  const handleClosePayment = () => {
+    setShowPayment(false);
+    setSelectedPlan(null);
+  };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Detailed Progress Tracking</CardTitle>
-        </CardHeader>
-        {progressData.map((metric, index) => (
-          <div key={index} className="border-b border-red-500/10 pb-4 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="text-white font-semibold">{metric.name}</h4>
-              <span className="text-gray-400">
-                {metric.current} {metric.unit}
-              </span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2.5">
-              <div
-                className="bg-red-500 h-2.5 rounded-full"
-                style={{
-                  width: `${
-                    ((metric.current - (metric.goal < metric.current ? metric.goal : 0)) /
-                      (metric.current > metric.goal ? metric.current : metric.goal)) *
-                    100
-                  }%`,
-                }}
-              />
-            </div>
-            <div className="flex justify-between text-sm text-gray-400 mt-1">
-              <span>Current: {metric.current} {metric.unit}</span>
-              <span>Goal: {metric.goal} {metric.unit}</span>
-            </div>
-          </div>
-        ))}
-      </Card>
+    <div className="member-dashboard">
+      {/* Pricing Section */}
+      <div className="py-32 bg-gradient-to-b from-gray-900 to-black">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-5xl font-extrabold text-center mb-20 bg-gradient-to-r from-white to-red-500 bg-clip-text text-transparent"
+        >
+          MEMBERSHIP PLANS
+        </motion.h2>
+
+        <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-3 gap-10">
+          {loading ? (
+            <p className="text-white text-center">Loading plans...</p>
+          ) : (
+            plans.map((plan, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2 }}
+                whileHover={{ y: -10 }}
+                className={`relative p-8 rounded-lg backdrop-blur-lg flex flex-col h-full text-white ${
+                  plan.popular
+                    ? "bg-red-600/20 border-2 border-red-500"
+                    : "bg-gray-900/60 border border-red-500/20"
+                }`}
+              >
+                {plan.popular && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-1 rounded-full text-sm font-semibold"
+                  >
+                    MOST POPULAR
+                  </motion.span>
+                )}
+                <div className="text-center">
+                  <h3 className="text-2xl font-extrabold bg-gradient-to-r from-white to-red-500 bg-clip-text text-transparent">
+                    {plan.name}
+                  </h3>
+                  <div className="mb-6 text-4xl font-extrabold bg-gradient-to-r from-white to-red-500 bg-clip-text text-transparent">
+                    <span>$</span>
+                    <span>{plan.price}</span>
+                    <span className="text-gray-400 text-lg ml-2">{plan.period}</span>
+                  </div>
+                </div>
+                <ul className="space-y-4 mb-8 flex-grow">
+                  {plan.features.map((feature, idx) => (
+                    <motion.li
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Dumbbell size={20} className="text-red-500" />
+                      {feature}
+                    </motion.li>
+                  ))}
+                </ul>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handlePlanSelect(plan)}
+                  className={`w-full py-4 mt-auto rounded-lg font-semibold text-white ${
+                    plan.popular ? "bg-red-500" : "bg-gray-800 hover:bg-red-500"
+                  }`}
+                >
+                  SELECT PLAN
+                </motion.button>
+              </motion.div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Payment Modal */}
+      {showPayment && selectedPlan && (
+        <PaymentGateway plan={selectedPlan} onClose={handleClosePayment} />
+      )}
     </div>
   );
 };
+
 
 const MemberDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -512,6 +796,15 @@ const MemberDashboard = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [memberProfile, setMemberProfile] = useState({});
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+const [token, setToken] = useState(localStorage.getItem("token"));
+
+useEffect(() => {
+  // Optionally, you can sync the localStorage and state if they change dynamically
+  localStorage.setItem("userId", userId);
+  localStorage.setItem("token", token);
+}, [userId, token]); // Retrieve the JWT token
+
   const navigate = useNavigate(); // Use navigate for redirection
 
   // Fetch member profile
@@ -538,6 +831,7 @@ const MemberDashboard = () => {
         return res.json();
       })
       .then((data) => {
+        console.log("Fetched Member Data:", data);
         setMemberProfile(data);
       })
       .catch((err) => {
@@ -552,7 +846,7 @@ const MemberDashboard = () => {
     { label: 'Workouts', icon: Dumbbell, content: 'Workouts Content' },
     { label: 'Nutrition', icon: Apple, content: 'Nutrition Content' },
     { label: 'Goals', icon: Target, content: 'Goals Content' },
-    { label: 'Progress', icon: TrendingUp, content: 'Progress Content' },
+    { label: 'Subscription', icon: DollarSign, content: 'Subscription' },
     { label: 'Logout', icon: LogOut, content: 'Logout' }, 
   ];
 
@@ -569,9 +863,12 @@ const MemberDashboard = () => {
 
   const handleLogout = () => {
     // Clear user session/token (example: remove from localStorage)
-    localStorage.removeItem("userId");
-    localStorage.removeItem("token");
-
+    localStorage.clear();
+    setUserId(null);
+    setToken(null);
+    setMemberProfile(null); 
+    console.log("Member Profile after logout:", memberProfile);
+   
     // Redirect to the login page
     navigate("/signin"); // Replace "/signin" with your login route
   };
@@ -600,7 +897,7 @@ const MemberDashboard = () => {
         } md:translate-x-0`}
       >
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold text-white">{memberProfile.username}</h1>
+          <h1 className="text-xl font-bold text-white"> {memberProfile.username || "Guest"}!</h1>
           <button
             className="md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -837,13 +1134,12 @@ const MemberDashboard = () => {
             </>
           )}
 
-          {activeSection === "Progress" && (
+          {activeSection === "Subscription" && (
             <>
               <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Progress Tracking</h2>
-                <p className="text-gray-400">Monitor your fitness journey metrics</p>
+               
               </div>
-              <ProgressContent />
+              <SubscriptionsSection />
             </>
           )}
         </main>
