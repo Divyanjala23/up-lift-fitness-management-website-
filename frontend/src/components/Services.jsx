@@ -113,7 +113,7 @@ const Services = () => {
 
   const handlePlanSelect = (plan) => {
     setSelectedPlan(plan);
-    setShowPayment(true);
+    navigate('/signin');
   };
 
   const handleClosePayment = () => {
@@ -276,8 +276,8 @@ const Services = () => {
                 whileHover={{ y: -10 }}
                 className={`relative p-8 rounded-lg backdrop-blur-lg ${
                   plan.popular
-                    ? "bg-red-600/20 border-2 border-red-500"
-                    : "bg-gray-900/60 border border-red-500/20"
+                    ? 'bg-red-600/20 border-2 border-red-500'
+                    : 'bg-gray-900/60 border border-red-500/20'
                 }`}
               >
                 {plan.popular && (
@@ -314,8 +314,8 @@ const Services = () => {
                   onClick={() => handlePlanSelect(plan)}
                   className={`w-full py-4 rounded-lg font-semibold ${
                     plan.popular
-                      ? "bg-red-500 text-white"
-                      : "bg-gray-800 text-white hover:bg-red-500"
+                      ? 'bg-red-500 text-white'
+                      : 'bg-gray-800 text-white hover:bg-red-500'
                   }`}
                 >
                   SELECT PLAN
@@ -326,13 +326,6 @@ const Services = () => {
         </div>
       </div>
 
-      {/* Payment Modal */}
-      {showPayment && selectedPlan && (
-        <PaymentGateway
-          plan={selectedPlan}
-          onClose={handleClosePayment}
-        />
-      )}
 
       <Footer />
     </div>

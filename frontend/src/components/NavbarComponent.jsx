@@ -310,6 +310,27 @@ const NavbarComponent = ({ isAuthenticated }) => {
         </AnimatePresence>
       </div>
     </motion.div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   );
 };
 

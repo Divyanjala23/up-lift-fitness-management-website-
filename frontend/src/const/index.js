@@ -6,7 +6,7 @@ export const navbarContent = {
     { text: "Home", linkTo: "/" },
     { text: "About", linkTo: "/about" },
     { text: "Services", linkTo: "/services" },
-    { text: "Schedule", linkTo: "/schedule" },
+    { text: "Shedule", linkTo: "/shedule" },
     { text: "Contact", linkTo: "/contact" },
     { text: "Community", linkTo: "/community" },
   ],

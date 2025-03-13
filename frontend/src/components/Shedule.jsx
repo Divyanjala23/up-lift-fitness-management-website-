@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const Schedule = () => {
+const Shedule = () => {
   const [activeView, setActiveView] = useState("recommended");
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeFilter, setActiveFilter] = useState(null);
@@ -478,4 +478,4 @@ const Schedule = () => {
 );
 };
 
-export default Schedule;
+export default Shedule;

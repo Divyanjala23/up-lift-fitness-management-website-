@@ -52,7 +52,8 @@ const SignInComponent = ({ onLogin }) => {
         // Decode JWT to get user details
         const decodedToken = jwtDecode(token);
         localStorage.setItem("userId", decodedToken.id);
-        localStorage.setItem("username", decodedToken.username);
+        console.log(localStorage.getItem("userId"));
+        localStorage.setItem("username", data.username);
         localStorage.setItem("role", decodedToken.role);
 
         // Call onLogin to update authentication state
@@ -60,7 +61,9 @@ const SignInComponent = ({ onLogin }) => {
 
         // Navigate to the home page
         if (decodedToken.role === "ADMIN") navigate("/admin");
-        else if (decodedToken.role === "MEMBER") navigate("/member");
+        else if (decodedToken.role === "MEMBER") setTimeout(() => {
+          navigate("/member"); // Adjust based on your routing method
+        }, 100);
         else if (decodedToken.role === "COACH") navigate("/coach");
         else setError("Unknown role detected. Please contact support.");
       } else {
