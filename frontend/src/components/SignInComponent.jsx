@@ -207,25 +207,6 @@ const SignInComponent = ({ onLogin }) => {
                     </button>
                   </div>
 
-                  {/* Remember me and forgot password */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <input
-                        id="remember-me"
-                        name="remember-me"
-                        type="checkbox"
-                        className="h-4 w-4 rounded bg-gray-800 border-gray-700 text-red-600 focus:ring-red-500"
-                      />
-                      <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-400">
-                        Remember me
-                      </label>
-                    </div>
-                    <div className="text-sm">
-                      <a href="#" className="text-red-500 hover:text-red-400 font-medium">
-                        Forgot password?
-                      </a>
-                    </div>
-                  </div>
 
                   {/* Error Message */}
                   {error && (

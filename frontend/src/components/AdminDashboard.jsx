@@ -150,32 +150,51 @@ const ActivityTable = () => (
   </div>
 );
 
-const PieChartCard = ({ title, data }) => (
-  <div className="rounded-xl border border-red-500/20 bg-black p-6">
-    <h3 className="mb-4 text-xl font-bold text-white">{title}</h3>
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={80}
-            fill="#ef4444"
-            dataKey="value"
-            label
-          >
-            {data.map((entry, index) => (
-              <Cell key={index} fill={index === 0 ? "#ef4444" : "#991b1b"} />
-            ))}
-          </Pie>
-          <Tooltip />
-        </PieChart>
-      </ResponsiveContainer>
+const PieChartCard = ({ title }) => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    // Fetch plan counts from the backend
+    axios.get('/api/member/plan-counts')
+      .then(response => {
+        const planData = Object.keys(response.data).map(plan => ({
+          name: plan,
+          value: response.data[plan],
+        }));
+        setData(planData);
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+  return (
+    <div className="rounded-xl border border-red-500/20 bg-black p-6">
+      <h3 className="mb-4 text-xl font-bold text-white">{title}</h3>
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80}
+              fill="#ef4444"
+              dataKey="value"
+              label
+            >
+              {data.map((entry, index) => (
+                <Cell key={index} fill={index === 0 ? "#ef4444" : "#991b1b"} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const MembersSection = ({ data, open, handleOpen,onDelete }) => (
   <div className="rounded-xl border border-red-500/20 bg-black p-6">
@@ -651,7 +670,14 @@ const SubscriptionsSection = () => {
       try {
         const response = await fetch('http://localhost:8080/api/plans'); // Replace with your actual endpoint
         const data = await response.json();
-        setPlans(data);
+        
+        // Ensure each plan has a features array, even if it's empty
+        const updatedPlans = data.map(plan => ({
+          ...plan,
+          features: plan.features || [], // Initialize features as an empty array if not present
+        }));
+        
+        setPlans(updatedPlans);
       } catch (error) {
         console.error("Error fetching plans:", error);
       }
@@ -678,7 +704,25 @@ const SubscriptionsSection = () => {
 
   const handleEditPlan = (plan) => {
     setEditingPlan(plan.id);
-    setEditedPlan({ ...plan });
+    setEditedPlan({
+      ...plan,
+      features: plan.features || [], // Ensure features is always an array
+    });
+  };
+
+  const handleFeatureChange = (index, newFeature) => {
+    const updatedFeatures = [...editedPlan.features];
+    updatedFeatures[index] = newFeature;
+    setEditedPlan({ ...editedPlan, features: updatedFeatures });
+  };
+
+  const handleAddFeature = () => {
+    setEditedPlan({ ...editedPlan, features: [...editedPlan.features, ''] });
+  };
+
+  const handleRemoveFeature = (index) => {
+    const updatedFeatures = editedPlan.features.filter((_, i) => i !== index);
+    setEditedPlan({ ...editedPlan, features: updatedFeatures });
   };
 
   const savePlanChanges = async () => {
@@ -720,6 +764,31 @@ const SubscriptionsSection = () => {
                   }
                   className="w-full rounded bg-gray-800 p-2 text-white"
                 />
+                <div>
+                  <h5 className="text-white">Features:</h5>
+                  {editedPlan.features.map((feature, index) => (
+                    <div key={index} className="flex items-center mb-2">
+                      <input
+                        type="text"
+                        value={feature}
+                        onChange={(e) => handleFeatureChange(index, e.target.value)}
+                        className="w-full rounded bg-gray-800 p-2 text-white"
+                      />
+                      <button
+                        onClick={() => handleRemoveFeature(index)}
+                        className="ml-2 text-red-500"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={handleAddFeature}
+                    className="text-blue-500"
+                  >
+                    Add Feature
+                  </button>
+                </div>
                 <button
                   onClick={savePlanChanges}
                   className="rounded bg-red-500 px-4 py-2 text-white"
@@ -792,15 +861,15 @@ const [revenueData, setRevenueData] = useState([]);
 const [activityData, setActivityData] = useState([]);
 
   const navigationItems = [
-    { value: "home", label: "Home", icon: Home },
+  
     { value: "dashboard", label: "Dashboard", icon: BarChart },
     { value: "members", label: "Members", icon: Users },
     { value: "trainers", label: "Trainers", icon: Users },
     { value: "assign-coach", label: "Assign Coach", icon: UserPlus },
     { value: "videos", label: "Videos", icon: Video },
-    { value: "community", label: "Community", icon: MessageSquare },
+    
     { value: "subscriptions", label: "Subscriptions", icon: CreditCard },
-    { value: "settings", label: "Settings", icon: Settings },
+    
     { value: "logout", label: "Logout", icon: LogOut }, 
     
   ];
@@ -1031,10 +1100,10 @@ const [activityData, setActivityData] = useState([]);
                 trend={statsData.subscriptions.trend}
               />
             </div>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <PieChartCard title="Revenue Distribution" data={revenueData} />
-              <ActivityTable data={activityData} />
-            </div>
+            {/* <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+             // <PieChartCard title="Revenue Distribution" data={revenueData} />
+             // <ActivityTable data={activityData} />
+            </div> */}
           </div>
         );
       case "members":
@@ -1117,22 +1186,7 @@ const [activityData, setActivityData] = useState([]);
       </aside>
 
       <div className="md:pl-64">
-        <header className="border-b border-red-500/20 bg-black">
-          <div className="flex items-center justify-between p-4">
-            <button
-              className="md:hidden"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6 text-white" />
-            </button>
-            <div className="flex items-center gap-4">
-              <SearchBar />
-              <NotificationBell />
-              <UserAvatar />
-            </div>
-          </div>
-        </header>
-
+        
         <main className="p-6">
           <PageHeader section={currentSection} />
           {renderSection()}

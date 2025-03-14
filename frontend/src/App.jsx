@@ -33,12 +33,7 @@ const App = () => {
   };
 
   const ProtectedRoute = ({ element }) => {
-    if (!isAuthenticated) {
-      console.log("User not authenticated, redirecting to /signin");
-      return <Navigate to="/signin" />;
-    }
-    console.log("User authenticated, rendering protected component");
-    return element;
+    return isAuthenticated ? element : <Navigate to="/signin" replace />;
   };
 
   const Layout = ({ children, includeNavbar = true }) => {
@@ -95,7 +90,7 @@ const App = () => {
           }
         />
 
-        {/* SignIn and SignUp routes where Navbar should always be visible */}
+        {/* SignIn and SignUp routes */}
         <Route
           path="/signin"
           element={
@@ -114,22 +109,7 @@ const App = () => {
         />
 
         {/* Protected Routes */}
-        <Route
-          path="/community"
-          element={
-            <Layout>
-              <ProtectedRoute element={<CommunityForum />} />
-            </Layout>
-          }
-        />
-        <Route
-          path="/shedule"
-          element={
-            <Layout>
-              <ProtectedRoute element={<Shedule />} />
-            </Layout>
-          }
-        />
+      
         <Route
           path="/admin"
           element={

@@ -8,6 +8,10 @@ import {
   Calendar,
   Clock,
   Heart,
+  Euro,
+  Zap,
+  BadgeDollarSign,
+  BicepsFlexed,
   Trophy,
   Dumbbell,
   Apple,
@@ -17,6 +21,7 @@ import {
   User,
   ChevronDown,
   TrendingUp,
+  ChartSpline,
   Menu,
   X,
   Settings,
@@ -40,47 +45,99 @@ import {
 } from 'recharts';
 
 // Custom Card Components
-const Card = ({ children, className = '' }) => (
-  <div className={`rounded-xl border border-red-500/20 bg-black p-6 ${className}`}>
+const Card = ({ children, className = '', variant = 'default' }) => {
+  const variantClasses = {
+    default: 'border-red-500/20 bg-black',
+    highlight: 'border-red-500/30 bg-black/90',
+    subtle: 'border-gray-800 bg-gray-900/50'
+  };
+  
+  return (
+    <div className={`rounded-xl border ${variantClasses[variant]} p-6 shadow-md shadow-red-900/10 transition-all duration-200 hover:shadow-lg hover:shadow-red-900/15 ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+const CardHeader = ({ children }) => (
+  <div className="mb-5 border-b border-red-500/10 pb-3">
     {children}
   </div>
 );
 
-const CardHeader = ({ children }) => <div className="mb-4">{children}</div>;
-
 const CardTitle = ({ children }) => (
-  <h3 className="text-xl font-bold text-white">{children}</h3>
+  <h3 className="text-xl font-bold text-white tracking-tight">
+    {children}
+  </h3>
 );
 
 const StatsCard = ({ icon: Icon, label, value, trend, color = 'red' }) => (
-  <Card>
+  <Card variant="highlight" className="overflow-hidden">
     <div className="flex items-start justify-between">
       <div>
-        <p className="text-sm text-gray-400">{label}</p>
+        <p className="text-sm font-medium text-gray-400">{label}</p>
         <h4 className="mt-2 text-2xl font-bold text-white">{value}</h4>
       </div>
-      <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-${color}-500/10`}>
-        <Icon className={`h-6 w-6 text-${color}-500`} />
+      <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-${color}-500/15`}>
+        <Icon className={`h-6 w-6 text-${color}-400`} />
       </div>
     </div>
     {trend && (
-      <div className="mt-4 text-sm">
-        <span className={trend >= 0 ? 'text-green-500' : 'text-red-500'}>
+      <div className="mt-4 flex items-center text-sm">
+        <span className={trend >= 0 ? 'text-green-400' : 'text-red-400'}>
           {trend >= 0 ? '+' : ''}
           {trend}%
         </span>
-        <span className="ml-1 text-gray-400">vs last week</span>
+        <TrendingUp className={`ml-1 h-3 w-3 ${trend >= 0 ? 'text-green-400' : 'text-red-400'}`} />
       </div>
     )}
   </Card>
 );
 
+
 const WorkoutSchedule = () => {
-  const scheduleData = [
-    { time: '09:00 AM', workout: 'Strength Training', trainer: 'John Doe' },
-    { time: '02:00 PM', workout: 'Cardio Session', trainer: 'Jane Smith' },
-    { time: '05:00 PM', workout: 'Yoga Class', trainer: 'Mike Johnson' },
-  ];
+  const [scheduleData, setScheduleData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Get memberId from localStorage
+    const memberId = localStorage.getItem('userId');
+    
+    if (!memberId) {
+      setError('Member ID not found in localStorage');
+      setLoading(false);
+      return;
+    }
+
+    // Construct the endpoint with the memberId
+    const endpoint = `http://localhost:8080/api/sessions/member/${memberId}`;
+
+    // Fetch data from the backend API
+    fetch(endpoint)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch schedule data');
+        }
+        return response.json(); // Parse the response as JSON
+      })
+      .then((data) => {
+        setScheduleData(data); // Set the fetched data in the state
+        setLoading(false); // Set loading to false after data is fetched
+      })
+      .catch((err) => {
+        setError(err.message); // Set error message if something goes wrong
+        setLoading(false); // Set loading to false even if there's an error
+      });
+  }, []); // Empty dependency array to fetch data once when the component mounts
+
+  if (loading) {
+    return <Card className="flex items-center justify-center py-10"><p>Loading schedule...</p></Card>;
+  }
+
+  if (error) {
+    return <Card className="flex items-center justify-center py-10 border-orange-500/30"><p className="text-orange-400">{error}</p></Card>;
+  }
 
   return (
     <Card>
@@ -88,89 +145,123 @@ const WorkoutSchedule = () => {
         <CardTitle>Today's Schedule</CardTitle>
       </CardHeader>
       <div className="space-y-4">
-        {scheduleData.map((session, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between border-b border-red-500/10 pb-4"
-          >
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10">
-                <Clock className="h-5 w-5 text-red-500" />
+        {scheduleData.length === 0 ? (
+          <p className="text-gray-400 text-center py-4">No scheduled workouts for today</p>
+        ) : (
+          scheduleData.map((session, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between border-b border-red-500/10 pb-4 last:border-b-0"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/15 ring-1 ring-red-500/20">
+                  <Clock className="h-5 w-5 text-red-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-white">{session.type}</p>
+                  <p className="text-sm text-gray-400">with {session.coachName}</p>
+                  <p className="text-sm text-gray-400">{session.date}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-white">{session.workout}</p>
-                <p className="text-sm text-gray-400">with {session.trainer}</p>
-              </div>
+              <p className="text-sm font-medium text-red-300">{session.time}</p>
             </div>
-            <p className="text-sm text-gray-400">{session.time}</p>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </Card>
   );
 };
 
-const ProgressChart = () => {
-  const progressData = [
-    { name: 'Week 1', weight: 180, strength: 100, cardio: 70 },
-    { name: 'Week 2', weight: 178, strength: 110, cardio: 75 },
-    { name: 'Week 3', weight: 176, strength: 115, cardio: 80 },
-    { name: 'Week 4', weight: 174, strength: 120, cardio: 85 },
-  ];
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Progress Overview</CardTitle>
-      </CardHeader>
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={progressData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-            <XAxis dataKey="name" stroke="#666" />
-            <YAxis stroke="#666" />
-            <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid #333' }} />
-            <Line type="monotone" dataKey="weight" stroke="#ef4444" />
-            <Line type="monotone" dataKey="strength" stroke="#22c55e" />
-            <Line type="monotone" dataKey="cardio" stroke="#3b82f6" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </Card>
-  );
-};
 
 const NutritionTracker = () => {
-  const nutritionData = [
-    { name: 'Proteins', value: 120, goal: 150 },
-    { name: 'Carbs', value: 200, goal: 250 },
-    { name: 'Fats', value: 50, goal: 65 },
-  ];
+  const [nutritionData, setNutritionData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!userId || !token) return;
+
+    fetch(`http://localhost:8080/api/nutrition/member/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(Error `${res.status}: Unable to fetch nutrition data.`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        // ✅ Calculate total protein, carbs, and calories
+        const totals = data.reduce(
+          (acc, meal) => {
+            meal.items.forEach((item) => {
+              acc.protein += item.protein || 0;
+              acc.carbs += item.carbs || 0;
+              acc.calories += item.calories || 0;
+            });
+            return acc;
+          },
+          { protein: 0, carbs: 0, calories: 0 }
+        );
+
+        // ✅ Define daily goals (Adjust as needed)
+        const goals = { protein: 150, carbs: 250, calories: 2200 };
+
+        // ✅ Format data for display
+        setNutritionData([
+          { name: "Protein", value: totals.protein, goal: goals.protein },
+          { name: "Carbs", value: totals.carbs, goal: goals.carbs },
+          { name: "Calories", value: totals.calories, goal: goals.calories },
+        ]);
+
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching nutrition data:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId, token]);
+
+  if (loading) return <div className="text-gray-400">Loading...</div>;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
+
+  const calculateProgress = (value, goal) => (goal > 0 ? (value / goal) * 100 : 0);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Nutrition Tracker</CardTitle>
-      </CardHeader>
-      <div className="space-y-4">
-        {nutritionData.map((item, index) => (
-          <div key={index}>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">{item.name}</span>
-              <span className="text-white">
-                {item.value}/{item.goal}g
+    <div className="space-y-4">
+      {nutritionData.map((nutrient) => {
+        const progress = calculateProgress(nutrient.value, nutrient.goal);
+
+        return (
+          <div key={nutrient.name} className="bg-gray-800 p-4 rounded-lg">
+            <div className="flex justify-between text-white mb-1">
+              <span>{nutrient.name}</span>
+              <span>
+                {nutrient.value} / {nutrient.goal}
               </span>
             </div>
-            <div className="mt-2 h-2 rounded-full bg-gray-700">
-              <div
-                className="h-2 rounded-full bg-red-500"
-                style={{ width: `${(item.value / item.goal) * 100}%` }}
-              />
+
+            {/* ✅ Custom Progress Bar */}
+            <div className="flex items-center">
+              <div className="w-full bg-gray-700 rounded-full h-3 mr-4">
+                <div
+                  className="bg-red-500 h-3 rounded-full"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <span className="text-gray-400 text-sm">{progress.toFixed(1)}%</span>
             </div>
           </div>
-        ))}
-      </div>
-    </Card>
+        );
+      })}
+    </div>
   );
 };
 
@@ -202,7 +293,7 @@ useEffect(() => {
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`Error ${res.status}: Unable to fetch workouts data.`);
+          throw new Error(Error `${res.status}: Unable to fetch workouts data.`);
         }
         return res.json();
       })
@@ -261,19 +352,18 @@ useEffect(() => {
   );
 };
 
+
 const NutritionContent = () => {
   const [nutritionData, setNutritionData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
-const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
-useEffect(() => {
-  // Optionally, you can sync the localStorage and state if they change dynamically
-  localStorage.setItem("userId", userId);
-  localStorage.setItem("token", token);
-}, [userId, token]); // Retrieve the JWT token
-
+  useEffect(() => {
+    localStorage.setItem("userId", userId);
+    localStorage.setItem("token", token);
+  }, [userId, token]);
 
   useEffect(() => {
     if (!userId || !token) return;
@@ -282,12 +372,12 @@ useEffect(() => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`Error ${res.status}: Unable to fetch nutrition data.`);
+          throw new Error(Error `${res.status}: Unable to fetch nutrition data.`);
         }
         return res.json();
       })
@@ -310,17 +400,30 @@ useEffect(() => {
     return <div className="text-red-500">Error: {error}</div>;
   }
 
-  const dailyTotals = nutritionData.reduce(
-    (acc, meal) => {
-      meal.items.forEach((item) => {
-        acc.calories += item.calories;
-        acc.protein += item.protein;
-        acc.carbs += item.carbs;
-      });
-      return acc;
-    },
-    { calories: 0, protein: 0, carbs: 0 },
-  );
+  // Group meals by date and mealType & calculate daily totals
+  const groupedMeals = nutritionData.reduce((acc, meal) => {
+    const date = new Date(meal.createdAt).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    if (!acc[date]) acc[date] = { mealsByType: {}, dailyTotals: { calories: 0, protein: 0, carbs: 0 } };
+    if (!acc[date].mealsByType[meal.mealType]) acc[date].mealsByType[meal.mealType] = [];
+
+    // Add meal data
+    acc[date].mealsByType[meal.mealType].push(meal);
+
+    // Update daily totals
+    meal.items.forEach((item) => {
+      acc[date].dailyTotals.calories += item.calories;
+      acc[date].dailyTotals.protein += item.protein;
+      acc[date].dailyTotals.carbs += item.carbs;
+    });
+
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-6">
@@ -328,38 +431,55 @@ useEffect(() => {
         <CardHeader>
           <CardTitle>Daily Nutrition Log</CardTitle>
         </CardHeader>
-        {nutritionData.map((meal) => (
-          <div key={meal.id} className="border-b border-red-500/10 pb-4 mb-4">
-            <h4 className="text-white font-semibold mb-2">{meal.name}</h4>
-            {meal.items.map((item, index) => (
-              <div key={index} className="flex justify-between text-gray-400">
-                <span>{item.food}</span>
-                <span>
-                  {item.calories} cal | {item.protein}g P | {item.carbs}g C
-                </span>
+
+        {Object.entries(groupedMeals).map(([date, { mealsByType, dailyTotals }]) => (
+          <div key={date} className="mb-6">
+            {/* ✅ Display Date */}
+            <h3 className="text-xl text-white font-bold mb-3">{date}</h3>
+
+            {Object.entries(mealsByType).map(([mealType, meals]) => (
+              <div key={mealType} className="mb-4">
+                {/* ✅ Display Meal Type (e.g., Breakfast, Lunch, Dinner) */}
+                <h4 className="text-lg text-red-400 font-semibold">{mealType}</h4>
+
+                {meals.map((meal) => (
+                  <div key={meal.id} className="border-b border-red-500/10 pb-4 mb-4">
+                    {meal.items.map((item, index) => (
+                      <div key={index} className="flex justify-between text-gray-400">
+                        <span>{item.food}</span>
+                        <span>
+                          {item.calories} cal | {item.protein}g P | {item.carbs}g C
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             ))}
+
+            {/* ✅ Daily Totals Section */}
+            <div className="mt-4 bg-red-500/10 p-4 rounded-lg">
+              <h4 className="text-white font-semibold">Daily Totals</h4>
+              <div className="flex justify-between text-gray-400">
+                <span>Calories</span>
+                <span>{dailyTotals.calories} cal</span>
+              </div>
+              <div className="flex justify-between text-gray-400">
+                <span>Protein</span>
+                <span>{dailyTotals.protein}g</span>
+              </div>
+              <div className="flex justify-between text-gray-400">
+                <span>Carbs</span>
+                <span>{dailyTotals.carbs}g</span>
+              </div>
+            </div>
           </div>
         ))}
-        <div className="mt-4 bg-red-500/10 p-4 rounded-lg">
-          <h4 className="text-white font-semibold">Daily Totals</h4>
-          <div className="flex justify-between text-gray-400">
-            <span>Calories</span>
-            <span>{dailyTotals.calories} cal</span>
-          </div>
-          <div className="flex justify-between text-gray-400">
-            <span>Protein</span>
-            <span>{dailyTotals.protein}g</span>
-          </div>
-          <div className="flex justify-between text-gray-400">
-            <span>Carbs</span>
-            <span>{dailyTotals.carbs}g</span>
-          </div>
-        </div>
       </Card>
     </div>
   );
 };
+;
 
 
 const GoalsContent = () => {
@@ -394,7 +514,7 @@ const GoalsContent = () => {
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`Error ${res.status}: Unable to fetch goals data.`);
+          throw new Error(Error `${res.status}: Unable to fetch goals data.`);
         }
         return res.json();
       })
@@ -447,7 +567,7 @@ const GoalsContent = () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        "Authorization":` Bearer ${token}`,
       },
     })
       .then(() => {
@@ -530,95 +650,101 @@ const GoalsContent = () => {
           {isFormVisible ? "Cancel" : "Add New Goal"}
         </button>
 
-        {/* New Goal Form */}
-        {isFormVisible && (
-          <form className="mt-4" onSubmit={handleGoalSubmit}>
-            <input
-              type="text"
-              name="name"
-              value={newGoal.name}
-              onChange={handleGoalChange}
-              placeholder="Goal Name"
-              className="input"
-              required
-            />
-            <input
-              type="text"
-              name="target"
-              value={newGoal.target}
-              onChange={handleGoalChange}
-              placeholder="Target"
-              className="input"
-              required
-            />
-            <input
-              type="number"
-              name="progress"
-              value={newGoal.progress}
-              onChange={handleGoalChange}
-              placeholder="Current"
-              className="input"
-              required
-            />
-            <select
-              name="status"
-              value={newGoal.status}
-              onChange={handleGoalChange}
-              className="input"
-            >
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-            </select>
-            <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">
-              Save Goal
-            </button>
-          </form>
-        )}
+    {/* New Goal Form */}
+{isFormVisible && (
+  <form className="mt-4 bg-gray-900 border-2 border-red-700 rounded-lg p-5 max-w-md shadow-lg" onSubmit={handleGoalSubmit}>
+    <input
+      type="text"
+      name="name"
+      value={newGoal.name}
+      onChange={handleGoalChange}
+      placeholder="Goal Name"
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+      required
+    />
+    <input
+      type="text"
+      name="target"
+      value={newGoal.target}
+      onChange={handleGoalChange}
+      placeholder="Target"
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+      required
+    />
+    <input
+      type="number"
+      name="progress"
+      value={newGoal.progress}
+      onChange={handleGoalChange}
+      placeholder="Current"
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+      required
+    />
+    <select
+      name="status"
+      value={newGoal.status}
+      onChange={handleGoalChange}
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+    >
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+    </select>
+    <button 
+      type="submit" 
+      className="w-full bg-red-700 hover:bg-red-600 text-white py-3 px-6 rounded font-bold uppercase tracking-wider transform transition-transform duration-200 hover:-translate-y-1 active:translate-y-0 hover:shadow-md"
+    >
+      Save Goal
+    </button>
+  </form>
+)}
 
-        {/* Edit Goal Form */}
-        {isEditFormVisible && editingGoal && (
-          <form className="mt-4" onSubmit={handleGoalUpdate}>
-            <input
-              type="text"
-              name="name"
-              value={editingGoal.name}
-              onChange={handleEditGoalChange}
-              placeholder="Goal Name"
-              className="input"
-              required
-            />
-            <input
-              type="text"
-              name="target"
-              value={editingGoal.target}
-              onChange={handleEditGoalChange}
-              placeholder="Target"
-              className="input"
-              required
-            />
-            <input
-              type="number"
-              name="progress"
-              value={editingGoal.progress}
-              onChange={handleEditGoalChange}
-              placeholder="Current"
-              className="input"
-              required
-            />
-            <select
-              name="status"
-              value={editingGoal.status}
-              onChange={handleEditGoalChange}
-              className="input"
-            >
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-            </select>
-            <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">
-              Update Goal
-            </button>
-          </form>
-        )}
+     {/* Edit Goal Form */}
+{isEditFormVisible && editingGoal && (
+  <form className="mt-4 bg-gray-900 border-2 border-red-700 rounded-lg p-5 max-w-md shadow-lg" onSubmit={handleGoalUpdate}>
+    <input
+      type="text"
+      name="name"
+      value={editingGoal.name}
+      onChange={handleEditGoalChange}
+      placeholder="Goal Name"
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+      required
+    />
+    <input
+      type="text"
+      name="target"
+      value={editingGoal.target}
+      onChange={handleEditGoalChange}
+      placeholder="Target"
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+      required
+    />
+    <input
+      type="number"
+      name="progress"
+      onChange={handleEditGoalChange}
+      placeholder="Current"
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+      required
+    />
+    <select
+      name="status"
+      value={editingGoal.status}
+      onChange={handleEditGoalChange}
+      className="w-full px-4 py-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+    >
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+    </select>
+    <button 
+      type="submit" 
+      className="w-full bg-red-700 hover:bg-red-600 text-white py-3 px-6 rounded font-bold uppercase tracking-wider transform transition-transform duration-200 hover:-translate-y-1 active:translate-y-0 hover:shadow-md"
+    >
+      Update Goal
+    </button>
+  </form>
+)}
+        
 
         {/* Display Goals */}
         {goals.map((goal) => (
@@ -785,6 +911,9 @@ const SubscriptionsSection = () => {
 
 
 const MemberDashboard = () => {
+  const navigate = useNavigate();
+  
+  // All state definitions must be at the top level and in the same order on every render
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('Dashboard');
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -794,18 +923,59 @@ const MemberDashboard = () => {
     { id: 3, message: 'Upcoming session in 2 hours', unread: false },
   ]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [nutritionData, setNutritionData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [memberProfile, setMemberProfile] = useState({});
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
-const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [membershipPlan, setMembershipPlan] = useState("");
+  const [dailyTotals, setDailyTotals] = useState({ calories: 0, protein: 0, carbs: 0 });
 
-useEffect(() => {
-  // Optionally, you can sync the localStorage and state if they change dynamically
-  localStorage.setItem("userId", userId);
-  localStorage.setItem("token", token);
-}, [userId, token]); // Retrieve the JWT token
+  // Save user ID and token to local storage
+  useEffect(() => {
+    localStorage.setItem("userId", userId);
+    localStorage.setItem("token", token);
+  }, [userId, token]);
 
-  const navigate = useNavigate(); // Use navigate for redirection
+  // Fetch nutrition data
+  useEffect(() => {
+    if (!userId || !token) return;
+
+    fetch(`http://localhost:8080/api/nutrition/member/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(Error `${res.status}: Unable to fetch nutrition data.`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setNutritionData(data);
+        setLoading(false);
+        
+        // Calculate daily totals from nutrition data
+        const totals = { calories: 0, protein: 0, carbs: 0 };
+        data.forEach((meal) => {
+          meal.items?.forEach((item) => {
+            totals.calories += item.calories || 0;
+            totals.protein += item.protein || 0;
+            totals.carbs += item.carbs || 0;
+          });
+        });
+        setDailyTotals(totals);
+      })
+      .catch((err) => {
+        console.error("Error fetching nutrition data:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId, token]);
 
   // Fetch member profile
   useEffect(() => {
@@ -819,26 +989,52 @@ useEffect(() => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, // Include the JWT token in the headers
+        "Authorization": `Bearer ${token}`,
       },
     })
       .then((res) => {
         if (res.status === 401) {
           throw new Error("Unauthorized access. Please check your login.");
         } else if (!res.ok) {
-          throw new Error(`Error ${res.status}: Unable to fetch data.`);
+          throw new Error(Error `${res.status}: Unable to fetch data.`);
         }
         return res.json();
       })
       .then((data) => {
         console.log("Fetched Member Data:", data);
         setMemberProfile(data);
+        setMembershipPlan(data.plan || "No Plan");
       })
       .catch((err) => {
         console.error("Error fetching user data:", err);
         setError(err.message);
       });
   }, [userId, token]);
+
+  // Group meals by date and mealType & calculate daily totals - moved outside useEffect
+  const groupedMeals = nutritionData.reduce((acc, meal) => {
+    const date = new Date(meal.createdAt).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    if (!acc[date]) acc[date] = { mealsByType: {}, dailyTotals: { calories: 0, protein: 0, carbs: 0 } };
+    if (!acc[date].mealsByType[meal.mealType]) acc[date].mealsByType[meal.mealType] = [];
+
+    // Add meal data
+    acc[date].mealsByType[meal.mealType].push(meal);
+
+    // Update daily totals
+    meal.items?.forEach((item) => {
+      acc[date].dailyTotals.calories += item.calories || 0;
+      acc[date].dailyTotals.protein += item.protein || 0;
+      acc[date].dailyTotals.carbs += item.carbs || 0;
+    });
+
+    return acc;
+  }, {});
 
   const navigationItems = [
     { label: 'Home', icon: Home, content: 'Home' }, 
@@ -862,7 +1058,7 @@ useEffect(() => {
   };
 
   const handleLogout = () => {
-    // Clear user session/token (example: remove from localStorage)
+    // Clear user session/token
     localStorage.clear();
     setUserId(null);
     setToken(null);
@@ -870,7 +1066,7 @@ useEffect(() => {
     console.log("Member Profile after logout:", memberProfile);
    
     // Redirect to the login page
-    navigate("/signin"); // Replace "/signin" with your login route
+    navigate("/signin");
   };
 
   const handleNotificationClick = (id) => {
@@ -888,6 +1084,14 @@ useEffect(() => {
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
+  if (loading) {
+    return <div className="text-gray-400">Loading nutrition data...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Sidebar */}
@@ -897,7 +1101,7 @@ useEffect(() => {
         } md:translate-x-0`}
       >
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold text-white"> {memberProfile.username || "Guest"}!</h1>
+          <h1 className="text-xl font-bold text-white">{memberProfile.username || "Guest"}!</h1>
           <button
             className="md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -938,211 +1142,118 @@ useEffect(() => {
       </aside>
 
       {/* Main Content */}
-      <div className="md:pl-64">
-        {/* Header */}
-        <header className="border-b border-red-500/20 bg-black">
-          <div className="flex items-center justify-between p-4">
-            <button
-              className="md:hidden"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6 text-white" />
-            </button>
-            <div className="flex items-center gap-4">
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-64 rounded-lg border border-red-500/20 bg-gray-800 py-2 pl-10 pr-4 text-white focus:border-red-500 focus:outline-none"
-                />
-              </div>
+<div className="md:pl-64 bg-gray-900 min-h-screen">
+  {/* Dynamic Content Section */}
+  <main className="p-6 lg:p-8">
+    {activeSection === "Dashboard" && (
+      <>
+        <div className="mb-8 border-b border-gray-800 pb-4">
+          <h2 className="text-3xl font-bold text-white">
+            Welcome back, {memberProfile.fullName || memberProfile.username || "User"}!
+          </h2>
+          <p className="text-gray-400 mt-2">Track your fitness journey and progress</p>
+        </div>
 
-              {/* Notifications */}
-              <div className="relative">
-                <button
-                  className="relative rounded-lg p-2 hover:bg-red-500/20"
-                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                >
-                  <Bell className="h-5 w-5 text-red-500" />
-                  {unreadCount > 0 && (
-                    <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
+        <div className="space-y-8">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+            <StatsCard
+              icon={BadgeDollarSign}
+              label="Membership"
+              value={membershipPlan}
+              trend={8}
+              color="red"
+              className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            />
+            <StatsCard
+              icon={ChartSpline}
+              label="Daily Calories Intake"
+              value={`${dailyTotals.calories.toFixed(0)} cal`}
+              trend={null}
+              color="green"
+              className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            />
+            <StatsCard
+              icon={BicepsFlexed}
+              label={<span>Daily Protein<br />Intake</span>}
+              value={dailyTotals.protein + " g"}
+              trend={3}
+              color="yellow"
+              className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            />
+            <StatsCard
+              icon={Zap}
+              label={<span>Daily Carbs<br />Intake</span>}
+              value={dailyTotals.carbs + " g"}
+              trend={10}
+              color="green"
+              className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            />
+          </div>
 
-                {/* Notifications Dropdown */}
-                {isNotificationsOpen && (
-                  <div className="absolute right-0 mt-2 w-72 rounded-lg bg-black border border-red-500/20 shadow-lg">
-                    <div className="flex items-center justify-between p-4 border-b border-red-500/20">
-                      <h3 className="font-semibold text-white">Notifications</h3>
-                      <button
-                        onClick={clearNotifications}
-                        className="text-sm text-red-500 hover:text-red-400"
-                      >
-                        Clear all
-                      </button>
-                    </div>
-                    <div className="max-h-64 overflow-y-auto">
-                      {notifications.length === 0 ? (
-                        <p className="p-4 text-gray-400 text-center">No notifications</p>
-                      ) : (
-                        notifications.map((notif) => (
-                          <button
-                            key={notif.id}
-                            className={`w-full p-4 text-left hover:bg-red-500/10 border-b border-red-500/20
-                              ${notif.unread ? 'bg-red-500/5' : ''}`}
-                            onClick={() => handleNotificationClick(notif.id)}
-                          >
-                            <p className="text-sm text-white">{notif.message}</p>
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+          {/* Workout Schedule Section */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 w-full">
+            <WorkoutSchedule className="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg" />
+          </div>
 
-              {/* Profile Dropdown */}
-              <div className="relative">
-                <button
-                  className="flex items-center gap-2"
-                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-600">
-                    <span className="font-bold text-white">M</span>
-                  </div>
-                  <ChevronDown
-                    className={`h-4 w-4 text-gray-400 transition-transform ${
-                      isProfileDropdownOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-
-                {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-lg bg-black border border-red-500/20 shadow-lg">
-                    <div className="p-2">
-                      <button className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-gray-400 hover:bg-red-500/10 hover:text-white">
-                        <Settings className="h-4 w-4" />
-                        Settings
-                      </button>
-                      <button className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-gray-400 hover:bg-red-500/10 hover:text-white">
-                        <LogOut className="h-4 w-4" />
-                        Log out
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+          {/* Other Content Grid */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="md:col-span-2 bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+              {/* Additional Content */}
             </div>
           </div>
-        </header>
+        </div>
+      </>
+    )}
 
-        {/* Dynamic Content Section */}
-        <main className="p-6">
-          {activeSection === "Dashboard" && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">
-                  Welcome back, {memberProfile.fullName}!
-                </h2>
-                <p className="text-gray-400">Track your fitness journey and progress</p>
-              </div>
+    {activeSection === "Workouts" && (
+      <>
+        <div className="mb-8 border-b border-gray-800 pb-4">
+          <h2 className="text-3xl font-bold text-white">Workout</h2>
+          <p className="text-gray-400 mt-2">Monitor your progress and stay consistent with your training plan.</p>
+        </div>
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+          <WorkoutsContent />
+        </div>
+      </>
+    )}
+    
+    {activeSection === "Nutrition" && (
+      <>
+        <div className="mb-8 border-b border-gray-800 pb-4">
+          <h2 className="text-3xl font-bold text-white">Nutrition</h2>
+          <p className="text-gray-400 mt-2">Monitor your daily food intake</p>
+        </div>
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+          <NutritionContent />
+        </div>
+      </>
+    )}
 
-              <div className="space-y-6">
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
-                  <StatsCard
-                    icon={Heart}
-                    label="Calories Burned"
-                    value="1,230 kcal"
-                    trend={8}
-                    color="red"
-                  />
-                  <StatsCard
-                    icon={Clock}
-                    label="Workout Time"
-                    value="2.1 hrs"
-                    trend={6}
-                    color="blue"
-                  />
-                  <StatsCard
-                    icon={Trophy}
-                    label="Achievements"
-                    value="12"
-                    trend={3}
-                    color="yellow"
-                  />
-                  <StatsCard
-                    icon={Calendar}
-                    label="Streak"
-                    value="18 days"
-                    trend={10}
-                    color="green"
-                  />
-                  <StatsCard
-                    icon={Activity}
-                    label="Steps Taken"
-                    value="12,540 steps"
-                    trend={15}
-                    color="purple"
-                  />
-                </div>
+    {activeSection === "Goals" && (
+      <>
+        <div className="mb-8 border-b border-gray-800 pb-4">
+          <h2 className="text-3xl font-bold text-white">Fitness Goals</h2>
+          <p className="text-gray-400 mt-2">Track and manage your fitness objectives</p>
+        </div>
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+          <GoalsContent />
+        </div>
+      </>
+    )}
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <ProgressChart />
-                  <WorkoutSchedule />
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                  <div className="md:col-span-2">
-                    <NutritionTracker />
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {activeSection === "Workouts" && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Workouts</h2>
-                <p className="text-gray-400">Track and review your workout history</p>
-              </div>
-              <WorkoutsContent />
-            </>
-          )}
-
-          {activeSection === "Nutrition" && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Nutrition</h2>
-                <p className="text-gray-400">Monitor your daily food intake</p>
-              </div>
-              <NutritionContent />
-            </>
-          )}
-
-          {activeSection === "Goals" && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white">Fitness Goals</h2>
-                <p className="text-gray-400">Track and manage your fitness objectives</p>
-              </div>
-              <GoalsContent />
-            </>
-          )}
-
-          {activeSection === "Subscription" && (
-            <>
-              <div className="mb-8">
-               
-              </div>
-              <SubscriptionsSection />
-            </>
-          )}
-        </main>
+    {activeSection === "Subscription" && (
+      <>
+        <div className="mb-8 border-b border-gray-800 pb-4">
+          <h2 className="text-3xl font-bold text-white">Subscription</h2>
+          <p className="text-gray-400 mt-2">Manage your membership plan</p>
+        </div>
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+          <SubscriptionsSection />
+        </div>
+      </>
+    )}
+</main>
       </div>
     </div>
   );

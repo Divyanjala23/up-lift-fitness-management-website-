@@ -20,10 +20,27 @@ const ContactUs = () => {
     message: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/contact/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.text();
+      alert(result);
+      
+      // Clear form after submission
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Failed to send message. Please try again.");
+    }
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -242,7 +259,7 @@ const ContactUs = () => {
         </div>
       </div>
 
-      <Footer />
+      
     </div>
   );
 };

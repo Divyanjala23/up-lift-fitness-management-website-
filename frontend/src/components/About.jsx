@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -21,11 +21,39 @@ const About = () => {
   const handleSignUp = () => {
     navigate('/signup');
   };
+ const [statsData, setStatsData] = useState({
+    members: { total: 0, trend: 0 },
+    trainers: { total: 0, trend: 0 },
+    subscriptions: { total: 0, trend: 0 }
+  });
+  const fetchDashboardData = async () => {
+    
+      // Mock data
+      const memberCountResponse = await fetch('http://localhost:8080/api/members/count');// Example: 100 members and a trend of 5
+      const trainerCountResponse = await fetch('http://localhost:8080/api/coaches/count'); // Example: 20 trainers and a trend of 2
+      const subscriptionResponse = await fetch('http://localhost:8080/api/plans/count'); // Example: 150 subscriptions and a trend of 10
+      const memberCount = await memberCountResponse.json();
+      const trainerCount = await trainerCountResponse.json();
+      const subscriptionCount = await subscriptionResponse.json();
+      console.log("Member Count:", memberCount); // Add console logs to check data
+      console.log("Trainer Count:", trainerCount); 
+      console.log("Subscription Count:", subscriptionCount); 
+      // Set the stats data directly with mock data
+      setStatsData({
+        members: { total: memberCount,  },
+        trainers: { total: trainerCount, },
+        subscriptions: { total: subscriptionCount,  }
+      });
+      
+    };
+    useEffect(() => {
+      fetchDashboardData();
+    }, []);
   
   const stats = [
     {
       icon: <Users className="text-red-500 mx-auto" />,
-      value: "2000+",
+      value: statsData.members.total.toLocaleString(),
       label: "Active Members",
       suffix: "warriors",
     },
@@ -37,15 +65,15 @@ const About = () => {
     },
     {
       icon: <Award className="text-red-500 mx-auto" />,
-      value: "15+",
+      value: statsData.trainers.total.toLocaleString(),
       label: "Expert Trainers",
       suffix: "certified",
     },
     {
       icon: <Target className="text-red-500 mx-auto" />,
-      value: "50+",
-      label: "Weekly Classes",
-      suffix: "programs",
+      value: statsData.subscriptions.total.toLocaleString(),
+      label: "Subscriptions",
+      suffix: "Plans",
     },
   ];
 
@@ -224,7 +252,7 @@ const About = () => {
           </motion.button>
         </motion.div>
       </div>
-      <Footer />
+      
     </div>
   );
 };
